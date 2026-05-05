@@ -232,50 +232,6 @@
   .prose p { margin: 0 0 18px; color: var(--paper); text-wrap: pretty; }
   .prose p:last-child { margin-bottom: 0; }
 
-  /* screenshot grid */
-  .shots {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    max-width: 540px;
-    margin: clamp(56px, 8vw, 88px) auto 0;
-  }
-  .shot {
-    position: relative;
-    aspect-ratio: 9 / 19.5;
-    border-radius: 30px;
-    background: var(--surface-2);
-    border: 1px solid var(--surface);
-    overflow: hidden;
-    isolation: isolate;
-    opacity: 0;
-    animation: shotReveal 1s var(--ease) forwards;
-  }
-  .shot:nth-child(1) { animation-delay: 1.10s; }
-  .shot:nth-child(2) { animation-delay: 1.20s; }
-  .shot:nth-child(3) { animation-delay: 1.30s; }
-  .shot:nth-child(4) { animation-delay: 1.40s; }
-  @keyframes shotReveal { to { opacity: 1; } }
-  .shot::before {
-    content: '';
-    position: absolute;
-    inset: 5px;
-    border-radius: 26px;
-    background:
-      radial-gradient(120% 60% at 50% 0%, rgba(var(--paper-rgb), 0.04) 0%, transparent 60%),
-      var(--bg);
-    z-index: 0;
-  }
-  .shot img {
-    position: absolute;
-    inset: 5px;
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
-    object-fit: cover;
-    border-radius: 26px;
-    z-index: 1;
-  }
-
   /* colophon */
   .colophon {
     margin: clamp(112px, 16vw, 160px) auto 0;
@@ -286,13 +242,8 @@
   }
   .colophon a { color: var(--mid); }
 
-  @media (max-width: 520px) {
-    .shots { gap: 10px; }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; animation: none; }
-    .shot { opacity: 1; animation: none; }
     .cell { opacity: 1; animation: none; }
     .hg-top, .hg-bot { animation: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     .hg-bot { fill: var(--mid); }
@@ -357,18 +308,6 @@
     <h2 id="about-heading" class="sr-only">About Dela</h2>
     <p>Drag a line across an abstract shape. Cut it into two perfectly balanced halves. As few lines as possible.</p>
     <p>34 hand-crafted levels. A daily procgen puzzle. An unlockable endless mode. iPhone and iPad, iOS 17 and later.</p>
-  </section>
-
-  <section aria-labelledby="screenshots-heading">
-    <h2 id="screenshots-heading" class="sr-only">Screenshots</h2>
-    <!-- 4 in-game screenshots at iPhone 6.7" resolution. Replace each .shot block with
-         <div class="shot"><img src="/screenshots/0X.jpg" alt="..."></div> when assets land. -->
-    <div class="shots" role="list" aria-label="Screenshots">
-      <div class="shot" role="listitem"></div>
-      <div class="shot" role="listitem"></div>
-      <div class="shot" role="listitem"></div>
-      <div class="shot" role="listitem"></div>
-    </div>
   </section>
 
   <p class="colophon reveal r6">
