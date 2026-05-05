@@ -25,134 +25,222 @@
 <style>
   :root {
     --bg: #131110;
+    --bg-warm: #1a1614;
     --paper: #E8E6E1;
     --mid: #9A9590;
     --muted: #6E6A64;
     --surface: #322F2C;
-    --max: 720px;
+    --surface-2: #221F1D;
+    --measure: 520px;
+    --max: 760px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
   }
   *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 400;
     font-size: 17px;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--paper);
     background: var(--bg);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
+  ::selection { background: rgba(232, 230, 225, 0.18); color: var(--paper); }
+
+  /* --- spotlight glow behind hero --- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(900px 540px at 50% 8%, rgba(232, 230, 225, 0.04) 0%, transparent 60%),
+      radial-gradient(620px 360px at 50% 8%, rgba(232, 230, 225, 0.025) 0%, transparent 70%);
+    z-index: 0;
+  }
+
   .wrap {
+    position: relative;
+    z-index: 1;
     max-width: var(--max);
     margin: 0 auto;
-    padding: clamp(48px, 8vw, 96px) 24px;
+    padding: clamp(64px, 10vw, 120px) 24px clamp(48px, 8vw, 96px);
   }
-  header.hero { text-align: center; padding-bottom: 8px; }
+
+  /* --- entrance --- */
+  .reveal { opacity: 0; transform: translateY(8px); animation: reveal 1.1s var(--ease) forwards; }
+  .r1 { animation-delay: 0.05s; }
+  .r2 { animation-delay: 0.20s; }
+  .r3 { animation-delay: 0.45s; }
+  .r4 { animation-delay: 0.65s; }
+  .r5 { animation-delay: 0.85s; }
+  .r6 { animation-delay: 1.05s; }
+  @keyframes reveal { to { opacity: 1; transform: none; } }
+
+  /* --- hero --- */
+  header.hero { text-align: center; }
   .wordmark {
     font-family: 'Pirata One', serif;
     font-weight: 400;
-    font-size: clamp(72px, 16vw, 132px);
-    line-height: 1;
-    letter-spacing: 0.01em;
+    font-size: clamp(80px, 17vw, 156px);
+    line-height: 0.95;
+    letter-spacing: 0.005em;
     margin: 0;
     color: var(--paper);
   }
   .tagline {
     font-style: italic;
     color: var(--mid);
-    font-size: clamp(16px, 2.5vw, 19px);
-    margin: 14px 0 0;
+    font-size: clamp(15px, 2.2vw, 18px);
+    letter-spacing: 0.01em;
+    margin: 16px 0 0;
   }
+
+  /* --- hero figure: hourglass polyomino --- */
   .hero-figure {
-    position: relative;
-    width: min(360px, 70vw);
+    width: min(300px, 64vw);
     aspect-ratio: 1 / 1;
-    margin: clamp(48px, 8vw, 80px) auto clamp(40px, 6vw, 64px);
+    margin: clamp(56px, 9vw, 88px) auto clamp(40px, 6vw, 64px);
   }
-  .hero-figure .half {
-    position: absolute;
-    top: 8%;
-    width: 46%;
-    height: 84%;
-    border-radius: 6px;
-    will-change: transform;
+  .hero-figure svg { width: 100%; height: 100%; display: block; }
+  .cell { fill: var(--paper); rx: 2; }
+  .cell--bot { fill: var(--mid); }
+  .hg-top { animation: drift-top 8s ease-in-out infinite; }
+  .hg-bot { animation: drift-bot 8s ease-in-out infinite; }
+  .hg-cut { animation: cut-pulse 8s ease-in-out infinite; }
+  @keyframes drift-top {
+    0%, 18%, 82%, 100% { transform: translate(0, 0); }
+    44%, 56% { transform: translate(0, -10px); }
   }
-  .hero-figure .half--left { left: 4%; background: var(--paper); animation: driftL 6s ease-in-out infinite; }
-  .hero-figure .half--right { right: 4%; background: var(--surface); animation: driftR 6s ease-in-out infinite; }
-  @keyframes driftL { 0%,100% { transform: translateX(0); } 50% { transform: translateX(-6%); } }
-  @keyframes driftR { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6%); } }
-  @media (prefers-reduced-motion: reduce) {
-    .hero-figure .half { animation: none; }
-    .hero-figure .half--left { transform: translateX(-3%); }
-    .hero-figure .half--right { transform: translateX(3%); }
+  @keyframes drift-bot {
+    0%, 18%, 82%, 100% { transform: translate(0, 0); }
+    44%, 56% { transform: translate(0, 10px); }
   }
-  .badge-row { display: flex; justify-content: center; padding-top: 8px; }
+  @keyframes cut-pulse {
+    0%, 18%, 82%, 100% { opacity: 0; }
+    44%, 56% { opacity: 0.55; }
+  }
+
+  /* --- App Store badge --- */
+  .badge-row { display: flex; justify-content: center; }
   .app-badge {
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 18px;
+    padding: 11px 20px;
     border: 1px solid var(--surface);
     border-radius: 12px;
     color: var(--paper);
-    background: transparent;
+    background: linear-gradient(180deg, rgba(232,230,225,0.025) 0%, transparent 100%);
     text-decoration: none;
-    min-height: 48px;
+    min-height: 52px;
     line-height: 1.1;
+    transition: border-color 0.5s var(--ease), background 0.5s var(--ease);
   }
+  .app-badge:hover { border-color: var(--mid); }
   .app-badge svg { flex: 0 0 auto; color: var(--paper); }
-  .app-badge .top { display: block; font-size: 11px; color: var(--mid); letter-spacing: 0.02em; }
-  .app-badge .bot { display: block; font-size: 17px; font-weight: 500; }
-  section { margin-top: clamp(56px, 9vw, 96px); }
-  h2 {
-    font-family: 'Pirata One', serif;
-    font-weight: 400;
-    font-size: clamp(36px, 6vw, 52px);
-    line-height: 1.05;
-    letter-spacing: 0.005em;
-    margin: 0 0 24px;
+  .app-badge .top { display: block; font-size: 10px; color: var(--mid); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1px; }
+  .app-badge .bot { display: block; font-size: 17px; font-weight: 500; letter-spacing: 0.005em; }
+
+  /* --- prose section --- */
+  .prose {
+    max-width: var(--measure);
+    margin: clamp(72px, 11vw, 128px) auto 0;
+  }
+  .prose p {
+    margin: 0 0 18px;
     color: var(--paper);
   }
-  p { margin: 0 0 18px; }
-  p:last-child { margin-bottom: 0; }
-  .grid-2 {
+  .prose p:last-child {
+    margin-bottom: 0;
+    color: var(--mid);
+  }
+
+  /* --- screenshot grid: phone bezels --- */
+  .shots {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 8px;
+    gap: 14px;
+    max-width: 540px;
+    margin: clamp(72px, 11vw, 120px) auto 0;
   }
   .shot {
+    position: relative;
     aspect-ratio: 9 / 19.5;
-    background: var(--surface);
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    color: var(--muted);
-    font-size: 13px;
+    border-radius: 30px;
+    background: var(--surface-2);
+    border: 1px solid var(--surface);
+    overflow: hidden;
+    isolation: isolate;
   }
-  .maker { color: var(--mid); }
-  .maker a { color: var(--paper); }
-  a { color: var(--paper); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-  a:hover { color: var(--paper); text-decoration-color: var(--mid); }
+  .shot::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 26px;
+    background:
+      radial-gradient(120% 60% at 50% 0%, rgba(232,230,225,0.04) 0%, transparent 60%),
+      var(--bg);
+    z-index: 0;
+  }
+  .shot img {
+    position: absolute;
+    inset: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    object-fit: cover;
+    border-radius: 26px;
+    z-index: 1;
+  }
+
+  /* --- colophon --- */
+  .colophon {
+    margin: clamp(72px, 11vw, 120px) auto 0;
+    text-align: center;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .colophon a { color: var(--mid); }
+
+  a { color: var(--paper); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; text-decoration-color: var(--surface); transition: text-decoration-color 0.4s var(--ease), color 0.4s var(--ease); }
+  a:hover { text-decoration-color: var(--mid); }
   a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; border-radius: 2px; }
+
+  /* --- footer --- */
   footer {
-    margin-top: clamp(72px, 10vw, 120px);
-    padding-top: 32px;
+    margin-top: clamp(80px, 12vw, 140px);
+    padding-top: 28px;
     border-top: 1px solid var(--surface);
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13px;
+    letter-spacing: 0.01em;
     display: flex;
     flex-wrap: wrap;
     gap: 8px 24px;
     justify-content: space-between;
+    align-items: center;
   }
-  footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  footer nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
   footer a { color: var(--mid); text-decoration: none; }
   footer a:hover { color: var(--paper); }
+
   @media (max-width: 520px) {
-    .grid-2 { gap: 10px; }
-    footer { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .shots { gap: 10px; }
+    footer { flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; animation: none; }
+    .hg-top, .hg-bot { animation: none; }
+    .hg-top { transform: translate(0, -5px); }
+    .hg-bot { transform: translate(0, 5px); }
+    .hg-cut { animation: none; opacity: 0.4; }
+    .app-badge, a { transition: none; }
   }
 </style>
 </head>
@@ -160,51 +248,66 @@
 <main class="wrap">
 
   <header class="hero">
-    <h1 class="wordmark">dela</h1>
-    <p class="tagline">the art of dividing.</p>
+    <h1 class="wordmark reveal r1">dela</h1>
+    <p class="tagline reveal r2">the art of dividing.</p>
 
-    <!-- Hero visual: CSS placeholder (two halves drifting apart). Swap for hero.mp4 / hero.gif when delivered. -->
-    <div class="hero-figure" aria-hidden="true">
-      <div class="half half--left"></div>
-      <div class="half half--right"></div>
+    <!-- Hero visual: 12-cell hourglass polyomino. Cells drift apart along the horizontal cut. Swap for hero.mp4 / hero.gif when delivered. -->
+    <div class="hero-figure reveal r3" aria-hidden="true">
+      <svg viewBox="0 0 153 153" xmlns="http://www.w3.org/2000/svg">
+        <!-- top half: row 0 (4 cells) + row 1 (2 cells inset) -->
+        <g class="hg-top">
+          <rect class="cell" x="0"   y="0"  width="36" height="36"/>
+          <rect class="cell" x="39"  y="0"  width="36" height="36"/>
+          <rect class="cell" x="78"  y="0"  width="36" height="36"/>
+          <rect class="cell" x="117" y="0"  width="36" height="36"/>
+          <rect class="cell" x="39"  y="39" width="36" height="36"/>
+          <rect class="cell" x="78"  y="39" width="36" height="36"/>
+        </g>
+        <!-- bottom half: row 2 (2 cells inset) + row 3 (4 cells) -->
+        <g class="hg-bot">
+          <rect class="cell cell--bot" x="39"  y="78"  width="36" height="36"/>
+          <rect class="cell cell--bot" x="78"  y="78"  width="36" height="36"/>
+          <rect class="cell cell--bot" x="0"   y="117" width="36" height="36"/>
+          <rect class="cell cell--bot" x="39"  y="117" width="36" height="36"/>
+          <rect class="cell cell--bot" x="78"  y="117" width="36" height="36"/>
+          <rect class="cell cell--bot" x="117" y="117" width="36" height="36"/>
+        </g>
+        <!-- the cut: thin paper-white line that fades in only at separation -->
+        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="#E8E6E1" stroke-width="1" stroke-linecap="round"/>
+      </svg>
     </div>
 
-    <div class="badge-row">
+    <div class="badge-row reveal r4">
       <!-- Coming-soon placeholder. Swap for Apple's official "Download on the App Store" SVG and live App Store URL when ready. -->
       <span class="app-badge" role="img" aria-label="Coming soon to the App Store">
         <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
           <path d="M21.5 16.4c0-2.7 2.2-4 2.3-4-1.3-1.8-3.2-2.1-3.9-2.1-1.7-.2-3.2 1-4.1 1-.9 0-2.2-1-3.6-1-1.8 0-3.6 1.1-4.5 2.7-1.9 3.3-.5 8.2 1.4 10.9.9 1.3 2 2.8 3.5 2.7 1.4-.1 1.9-.9 3.6-.9s2.2.9 3.6.9c1.5 0 2.5-1.3 3.4-2.6 1.1-1.5 1.5-3 1.5-3-.1 0-2.9-1.1-2.9-4.6zM18.6 8.8c.7-.9 1.2-2.1 1.1-3.3-1 .1-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.2 1.1.1 2.3-.6 3-1.5z" fill="currentColor"/>
         </svg>
         <span>
-          <span class="top">Coming soon to the</span>
+          <span class="top">Coming soon</span>
           <span class="bot">App Store</span>
         </span>
       </span>
     </div>
   </header>
 
-  <section>
-    <h2>What is Dela</h2>
+  <section class="prose reveal r5">
     <p>Drag your finger across an abstract shape to cut it into two perfectly balanced halves. Use as few straight lines as possible.</p>
     <p>34 hand-crafted curriculum levels, a daily procgen puzzle, and an unlockable endless mode. iPhone and iPad. iOS 17 and later.</p>
     <p>No ads. No in-app purchases. No tracking. No accounts. No leaderboards. No push notifications. By design.</p>
   </section>
 
-  <section>
-    <h2>Levels</h2>
-    <!-- 4 in-game screenshots at iPhone 6.7" resolution. Replace each .shot block with <img src="/screenshots/0X.jpg" alt="..."> when assets land. -->
-    <div class="grid-2" role="list">
-      <div class="shot" role="listitem">screenshot 1</div>
-      <div class="shot" role="listitem">screenshot 2</div>
-      <div class="shot" role="listitem">screenshot 3</div>
-      <div class="shot" role="listitem">screenshot 4</div>
-    </div>
-  </section>
+  <!-- 4 in-game screenshots at iPhone 6.7" resolution. Replace each .shot block with <div class="shot"><img src="/screenshots/0X.jpg" alt="..."></div> when assets land. -->
+  <div class="shots reveal r6" role="list" aria-label="Screenshots">
+    <div class="shot" role="listitem"></div>
+    <div class="shot" role="listitem"></div>
+    <div class="shot" role="listitem"></div>
+    <div class="shot" role="listitem"></div>
+  </div>
 
-  <section>
-    <h2>About the maker</h2>
-    <p class="maker">Built solo by Erik Nielsen, an independent designer-engineer in Stockholm. More work at <a href="https://sorkila.com">sorkila.com</a>.</p>
-  </section>
+  <p class="colophon reveal r6">
+    Built solo by Erik Nielsen, Stockholm. <a href="https://sorkila.com">sorkila.com</a>
+  </p>
 
   <footer>
     <nav aria-label="Site">
