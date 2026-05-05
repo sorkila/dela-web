@@ -14,29 +14,66 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #131110;
+    --paper: #E8E6E1;
+    --mid: #9A9590;
+    --muted: #8B857C;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; height: 100%; }
   body {
     font-family: 'Inter', -apple-system, sans-serif;
-    background: #131110;
-    color: #E8E6E1;
+    background: var(--bg);
+    color: var(--paper);
     display: grid;
     place-items: center;
     text-align: center;
     -webkit-font-smoothing: antialiased;
+    padding: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
   }
+  main { animation: fade 0.7s var(--ease) both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* a small shape that didn't quite balance */
+  .unbalanced {
+    width: 96px;
+    height: 36px;
+    margin: 0 auto 28px;
+    display: flex;
+    gap: 14px;
+    align-items: stretch;
+  }
+  .unbalanced span {
+    display: block;
+    border-radius: 4px;
+    background: var(--paper);
+  }
+  .unbalanced .l { flex: 1; }
+  .unbalanced .r { flex: 0.55; background: var(--mid); transform: translateY(6px); }
+
   h1 {
     font-family: 'Pirata One', serif;
     font-weight: 400;
-    font-size: clamp(64px, 14vw, 112px);
+    font-size: clamp(56px, 12vw, 96px);
     line-height: 1;
     margin: 0;
+    color: var(--paper);
   }
-  p { color: #9A9590; margin: 16px 0 24px; font-size: 16px; }
-  a { color: #E8E6E1; text-decoration: underline; text-underline-offset: 3px; }
+  p { color: var(--muted); margin: 14px 0 0; font-size: 16px; }
+  a { color: var(--paper); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(232,230,225,0.25); transition: text-decoration-color 0.4s var(--ease); }
+  @media (hover: hover) { a:hover { text-decoration-color: var(--mid); } }
+  a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    main { animation: none; }
+  }
 </style>
 </head>
 <body>
 <main>
+  <div class="unbalanced" aria-hidden="true"><span class="l"></span><span class="r"></span></div>
   <h1>404</h1>
   <p>nothing to divide here.</p>
   <p><a href="/">return home</a></p>

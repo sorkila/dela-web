@@ -25,37 +25,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Dela",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "iOS 17",
+  "description": "A minimalist iOS puzzle game about cutting abstract shapes into two perfectly balanced halves with as few straight lines as possible.",
+  "url": "https://dela.app/",
+  "author": { "@type": "Person", "name": "Erik Nielsen", "url": "https://sorkila.com" }
+}
+</script>
 <style>
-  :root {
-    --bg: #131110;
-    --bg-warm: #1a1614;
-    --paper: #E8E6E1;
-    --mid: #9A9590;
-    --muted: #6E6A64;
-    --surface: #322F2C;
-    --surface-2: #221F1D;
-    --measure: 520px;
-    --max: 760px;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { scroll-behavior: smooth; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 17px;
-    line-height: 1.65;
-    color: var(--paper);
-    background: var(--bg);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    overflow-x: hidden;
-    text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-  }
-  ::selection { background: rgba(232, 230, 225, 0.18); color: var(--paper); }
-
-  /* --- spotlight glow behind hero --- */
+  /* spotlight glow */
   body::before {
     content: '';
     position: fixed;
@@ -67,18 +51,7 @@
     z-index: 0;
   }
 
-  .wrap {
-    position: relative;
-    z-index: 1;
-    max-width: var(--max);
-    margin: 0 auto;
-    padding-top: max(clamp(64px, 10vw, 120px), env(safe-area-inset-top, 0px) + 56px);
-    padding-right: max(24px, env(safe-area-inset-right, 0px));
-    padding-bottom: max(clamp(48px, 8vw, 96px), env(safe-area-inset-bottom, 0px) + 32px);
-    padding-left: max(24px, env(safe-area-inset-left, 0px));
-  }
-
-  /* --- entrance --- */
+  /* staggered entrance */
   .reveal { opacity: 0; transform: translateY(8px); animation: reveal 1.1s var(--ease) forwards; }
   .r1 { animation-delay: 0.05s; }
   .r2 { animation-delay: 0.20s; }
@@ -88,12 +61,11 @@
   .r6 { animation-delay: 1.05s; }
   @keyframes reveal { to { opacity: 1; transform: none; } }
 
-  /* --- hero --- */
   header.hero { text-align: center; }
   .wordmark {
     font-family: 'Pirata One', serif;
     font-weight: 400;
-    font-size: clamp(80px, 17vw, 156px);
+    font-size: clamp(80px, 17vw, 180px);
     line-height: 0.95;
     letter-spacing: 0.005em;
     margin: 0;
@@ -104,39 +76,34 @@
     color: var(--mid);
     font-size: clamp(15px, 2.2vw, 18px);
     letter-spacing: 0.01em;
-    margin: 16px 0 0;
+    margin: 14px 0 0;
     text-wrap: balance;
   }
 
-  /* --- hero figure: hourglass polyomino --- */
+  /* hero figure: 12-cell hourglass polyomino. Drag-to-cut interactive (see <script>). */
   .hero-figure {
     width: min(300px, 64vw);
     aspect-ratio: 1 / 1;
-    margin: clamp(56px, 9vw, 88px) auto clamp(40px, 6vw, 64px);
+    margin: clamp(40px, 6vw, 64px) auto clamp(28px, 4vw, 40px);
     overflow: visible;
+    cursor: ns-resize;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
   .hero-figure svg { width: 100%; height: 100%; display: block; overflow: visible; }
   .cell { fill: var(--paper); rx: 2; }
   .cell--bot { fill: var(--mid); }
 
-  /*
-   * 11s narrative cycle, deliberate pacing:
-   *   0 - 22%  rest
-   *  22 - 28%  cut line is drawn left to right (the moment of intention)
-   *  28 - 45%  halves separate, exponential ease-out (snap and settle)
-   *  45 - 64%  held apart in stillness
-   *  64 - 82%  halves rejoin, softly accelerating ease-in-out
-   *  82 - 88%  cut line fades (the cut "heals")
-   *  88 - 100% rest
-   * No scale anywhere — only translation. Cells keep their size.
-   */
-  .hg-top { animation: top-drift 11s infinite; }
-  .hg-bot { animation: bot-drift 11s infinite; }
+  /* 11s narrative cycle. animation-delay: -2.75s starts at the cut-drawing moment on first paint
+     so the user sees motion immediately rather than 2.5s of static rest. */
+  .hg-top { animation: top-drift 11s -2.75s infinite; }
+  .hg-bot { animation: bot-drift 11s -2.75s infinite; }
   .hg-cut {
     stroke-dasharray: 200;
     stroke-dashoffset: 200;
     opacity: 0;
-    animation: cut-line 11s infinite;
+    animation: cut-line 11s -2.75s infinite;
   }
   @keyframes top-drift {
     0%   { transform: translate(0, 0); animation-timing-function: linear; }
@@ -162,7 +129,20 @@
     100%    { stroke-dashoffset: 200; opacity: 0; }
   }
 
-  /* --- App Store badge --- */
+  /* manual mode: JS sets data-mode="manual" while the visitor is dragging.
+     Animation is removed so inline transforms on the groups take over.
+     Transitions smooth the manual movement and the post-release return. */
+  .hero-figure[data-mode="manual"] .hg-top,
+  .hero-figure[data-mode="manual"] .hg-bot,
+  .hero-figure[data-mode="manual"] .hg-cut {
+    animation: none;
+    transition:
+      transform 0.5s var(--ease),
+      opacity 0.35s var(--ease),
+      stroke-dashoffset 0.35s var(--ease);
+  }
+
+  /* badge */
   .badge-row { display: flex; justify-content: center; }
   .app-badge {
     display: inline-flex;
@@ -176,10 +156,6 @@
     text-decoration: none;
     min-height: 52px;
     line-height: 1.1;
-    transition: border-color 0.5s var(--ease), background 0.5s var(--ease);
-  }
-  @media (hover: hover) {
-    .app-badge:hover { border-color: var(--mid); }
   }
   .app-badge svg { flex: 0 0 auto; color: var(--paper); }
   .app-badge .top { display: block; font-size: 10px; color: var(--mid); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 1px; }
@@ -187,36 +163,30 @@
 
   .fineprint {
     margin: 18px auto 0;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--mid);
-    letter-spacing: 0.01em;
+    letter-spacing: 0.04em;
     text-align: center;
     text-wrap: balance;
-    max-width: 460px;
+    max-width: 540px;
   }
+  .fineprint .dot { color: var(--muted); margin: 0 0.5em; }
 
-  /* --- prose section --- */
+  /* prose */
   .prose {
     max-width: var(--measure);
-    margin: clamp(72px, 11vw, 128px) auto 0;
+    margin: clamp(96px, 14vw, 144px) auto 0;
   }
-  .prose p {
-    margin: 0 0 18px;
-    color: var(--paper);
-    text-wrap: pretty;
-  }
-  .prose p:last-child {
-    margin-bottom: 0;
-    color: var(--mid);
-  }
+  .prose p { margin: 0 0 18px; color: var(--paper); text-wrap: pretty; }
+  .prose p:last-child { margin-bottom: 0; }
 
-  /* --- screenshot grid: phone bezels --- */
+  /* screenshot grid */
   .shots {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
     max-width: 540px;
-    margin: clamp(72px, 11vw, 120px) auto 0;
+    margin: clamp(56px, 8vw, 88px) auto 0;
   }
   .shot {
     position: relative;
@@ -247,9 +217,9 @@
     z-index: 1;
   }
 
-  /* --- colophon --- */
+  /* colophon */
   .colophon {
-    margin: clamp(72px, 11vw, 120px) auto 0;
+    margin: clamp(112px, 16vw, 160px) auto 0;
     text-align: center;
     font-style: italic;
     color: var(--muted);
@@ -257,66 +227,31 @@
   }
   .colophon a { color: var(--mid); }
 
-  a { color: var(--paper); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; text-decoration-color: var(--surface); transition: text-decoration-color 0.4s var(--ease), color 0.4s var(--ease); }
-  @media (hover: hover) {
-    a:hover { text-decoration-color: var(--mid); }
-  }
-  a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; border-radius: 2px; }
-
-  /* --- footer --- */
-  footer {
-    margin-top: clamp(80px, 12vw, 140px);
-    padding-top: 28px;
-    border-top: 1px solid var(--surface);
-    color: var(--muted);
-    font-size: 14px;
-    letter-spacing: 0.01em;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 24px;
-    justify-content: space-between;
-    align-items: center;
-  }
-  footer nav { display: flex; flex-wrap: wrap; gap: 0 14px; margin-left: -10px; }
-  footer a {
-    color: var(--mid);
-    text-decoration: none;
-    padding: 10px;
-    display: inline-block;
-    line-height: 1;
-  }
-  @media (hover: hover) {
-    footer a:hover { color: var(--paper); }
-  }
-
   @media (max-width: 520px) {
     .shots { gap: 10px; }
-    footer { flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-    footer nav { justify-content: center; margin-left: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; animation: none; }
     .hg-top, .hg-bot { animation: none; }
     .hg-top { transform: translate(0, -7px); }
     .hg-bot { transform: translate(0, 7px); }
     .hg-cut { animation: none; opacity: 0.4; stroke-dashoffset: 0; }
-    .app-badge, a { transition: none; }
+    .hero-figure { cursor: default; }
   }
 </style>
 </head>
 <body>
-<main class="wrap">
+<main class="wrap wrap--home">
 
   <header class="hero">
     <h1 class="wordmark reveal r1">dela</h1>
     <p class="tagline reveal r2">the art of dividing.</p>
 
-    <!-- Hero visual: 12-cell hourglass polyomino. Cells drift apart along the horizontal cut. Swap for hero.mp4 / hero.gif when delivered. -->
-    <div class="hero-figure reveal r3" aria-hidden="true">
-      <svg viewBox="0 0 153 153" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <!-- top half: row 0 (4 cells) + row 1 (2 cells inset) -->
+    <!-- Hero visual: 12-cell hourglass polyomino. Drag the figure vertically to cut it.
+         Swap for hero.mp4 / hero.gif when delivered. -->
+    <div class="hero-figure reveal r3" id="hero-figure">
+      <svg viewBox="0 0 153 153" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <g class="hg-top">
           <rect class="cell" x="0"   y="0"  width="36" height="36"/>
           <rect class="cell" x="39"  y="0"  width="36" height="36"/>
@@ -325,7 +260,6 @@
           <rect class="cell" x="39"  y="39" width="36" height="36"/>
           <rect class="cell" x="78"  y="39" width="36" height="36"/>
         </g>
-        <!-- bottom half: row 2 (2 cells inset) + row 3 (4 cells) -->
         <g class="hg-bot">
           <rect class="cell cell--bot" x="39"  y="78"  width="36" height="36"/>
           <rect class="cell cell--bot" x="78"  y="78"  width="36" height="36"/>
@@ -334,13 +268,13 @@
           <rect class="cell cell--bot" x="78"  y="117" width="36" height="36"/>
           <rect class="cell cell--bot" x="117" y="117" width="36" height="36"/>
         </g>
-        <!-- the cut: thin paper-white line that fades in only at separation -->
         <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="#E8E6E1" stroke-width="0.8" stroke-linecap="round" pathLength="200"/>
       </svg>
     </div>
 
     <div class="badge-row reveal r4">
-      <!-- Coming-soon placeholder. Swap for Apple's official "Download on the App Store" SVG and live App Store URL when ready. -->
+      <!-- Coming-soon placeholder. Swap for Apple's official "Download on the App Store" badge
+           and the live App Store URL when ready. -->
       <span class="app-badge" role="img" aria-label="Coming soon to the App Store">
         <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
           <path d="M21.5 16.4c0-2.7 2.2-4 2.3-4-1.3-1.8-3.2-2.1-3.9-2.1-1.7-.2-3.2 1-4.1 1-.9 0-2.2-1-3.6-1-1.8 0-3.6 1.1-4.5 2.7-1.9 3.3-.5 8.2 1.4 10.9.9 1.3 2 2.8 3.5 2.7 1.4-.1 1.9-.9 3.6-.9s2.2.9 3.6.9c1.5 0 2.5-1.3 3.4-2.6 1.1-1.5 1.5-3 1.5-3-.1 0-2.9-1.1-2.9-4.6zM18.6 8.8c.7-.9 1.2-2.1 1.1-3.3-1 .1-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.2 1.1.1 2.3-.6 3-1.5z" fill="currentColor"/>
@@ -352,21 +286,28 @@
       </span>
     </div>
 
-    <p class="fineprint reveal r4">no ads. no IAP. no tracking. no login. one price.</p>
+    <p class="fineprint reveal r4">
+      no ads<span class="dot">·</span>no IAP<span class="dot">·</span>no tracking<span class="dot">·</span>no login<span class="dot">·</span>one price
+    </p>
   </header>
 
-  <section class="prose reveal r5">
+  <section class="prose reveal r5" aria-labelledby="about-heading">
+    <h2 id="about-heading" class="sr-only">About Dela</h2>
     <p>Drag your finger across an abstract shape to cut it into two perfectly balanced halves. Use as few straight lines as possible.</p>
     <p>34 hand-crafted curriculum levels, a daily procgen puzzle, and an unlockable endless mode. iPhone and iPad. iOS 17 and later.</p>
   </section>
 
-  <!-- 4 in-game screenshots at iPhone 6.7" resolution. Replace each .shot block with <div class="shot"><img src="/screenshots/0X.jpg" alt="..."></div> when assets land. -->
-  <div class="shots reveal r6" role="list" aria-label="Screenshots">
-    <div class="shot" role="listitem"></div>
-    <div class="shot" role="listitem"></div>
-    <div class="shot" role="listitem"></div>
-    <div class="shot" role="listitem"></div>
-  </div>
+  <section aria-labelledby="screenshots-heading">
+    <h2 id="screenshots-heading" class="sr-only">Screenshots</h2>
+    <!-- 4 in-game screenshots at iPhone 6.7" resolution. Replace each .shot block with
+         <div class="shot"><img src="/screenshots/0X.jpg" alt="..."></div> when assets land. -->
+    <div class="shots reveal r6" role="list" aria-label="Screenshots">
+      <div class="shot" role="listitem"></div>
+      <div class="shot" role="listitem"></div>
+      <div class="shot" role="listitem"></div>
+      <div class="shot" role="listitem"></div>
+    </div>
+  </section>
 
   <p class="colophon reveal r6">
     Built solo by Erik Nielsen, Stockholm. <a href="https://sorkila.com">sorkila.com</a>
@@ -377,11 +318,101 @@
       <a href="/privacy/">Privacy</a>
       <a href="/support/">Support</a>
       <a href="/press/">Press</a>
-      <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" rel="external">License</a>
+      <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" rel="external">Terms</a>
     </nav>
     <span>&copy; 2026 Erik Nielsen</span>
   </footer>
 
 </main>
+
+<script>
+/* Hero drag-to-cut interaction.
+   The auto loop runs by default. When the visitor drags the figure vertically,
+   the JS pauses the loop, follows the pointer, then animates a clean cut +
+   separation + close before handing back to the loop. */
+(() => {
+  const figure = document.getElementById('hero-figure');
+  if (!figure) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const top = figure.querySelector('.hg-top');
+  const bot = figure.querySelector('.hg-bot');
+  const cut = figure.querySelector('.hg-cut');
+  if (!top || !bot || !cut) return;
+
+  let pointerDown = false;
+  let pointerId = null;
+  let startY = 0;
+  let queued = null;
+
+  function paint(progress) {
+    const eased = Math.max(0, Math.min(1, progress));
+    const offset = eased * 14;
+    top.style.transform = `translate(0, ${-offset}px)`;
+    bot.style.transform = `translate(0, ${offset}px)`;
+    const lineProgress = Math.min(1, eased * 1.8);
+    cut.style.opacity = lineProgress * 0.55;
+    cut.style.strokeDashoffset = (1 - lineProgress) * 200;
+  }
+
+  function clearInline() {
+    top.style.transform = '';
+    bot.style.transform = '';
+    cut.style.opacity = '';
+    cut.style.strokeDashoffset = '';
+    /* Drop the negative animation-delay on resume so the auto cycle picks up
+       cleanly from the closed state instead of jumping to mid-cut. */
+    top.style.animationDelay = '0s';
+    bot.style.animationDelay = '0s';
+    cut.style.animationDelay = '0s';
+    delete figure.dataset.mode;
+  }
+
+  function release() {
+    figure.dataset.mode = 'manual';
+    paint(1);
+    queued && clearTimeout(queued);
+    queued = setTimeout(() => {
+      paint(0);
+      queued = setTimeout(() => {
+        clearInline();
+        queued = null;
+      }, 700);
+    }, 1600);
+  }
+
+  figure.addEventListener('pointerdown', (e) => {
+    pointerDown = true;
+    pointerId = e.pointerId;
+    if (queued) { clearTimeout(queued); queued = null; }
+    figure.dataset.mode = 'manual';
+    startY = e.clientY;
+    paint(0);
+    try { figure.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  });
+
+  figure.addEventListener('pointermove', (e) => {
+    if (!pointerDown || e.pointerId !== pointerId) return;
+    const dist = Math.abs(e.clientY - startY);
+    paint(dist / 80);
+  });
+
+  function up(e) {
+    if (!pointerDown || (e && e.pointerId !== pointerId)) return;
+    pointerDown = false;
+    pointerId = null;
+    release();
+  }
+  figure.addEventListener('pointerup', up);
+  figure.addEventListener('pointercancel', up);
+})();
+
+/* console */
+console.log(
+  '%c the art of dividing. ',
+  'background:#E8E6E1;color:#131110;padding:14px 24px;font-family:serif;font-style:italic;font-size:14px;letter-spacing:0.01em;'
+);
+</script>
 </body>
 </html>
