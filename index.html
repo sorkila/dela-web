@@ -24,9 +24,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="6dcc31dc-88bf-40f4-b641-b362c6f1867d"></script>
 <script type="application/ld+json">
@@ -226,6 +223,33 @@
   }
   .fineprint .dot { color: var(--muted); margin: 0 0.5em; }
 
+  /* drag-to-cut affordance: fades in 6s after page load if the visitor
+     hasn't already dragged the figure. */
+  .drag-hint {
+    margin: 14px auto 0;
+    text-align: center;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transition: opacity 0.7s var(--ease);
+    pointer-events: none;
+  }
+  .drag-hint.show { opacity: 1; }
+
+  /* manifesto: the position, set apart from the descriptive prose. */
+  .manifesto {
+    max-width: 580px;
+    margin: clamp(96px, 14vw, 144px) auto 0;
+    font-size: clamp(20px, 2.4vw, 24px);
+    line-height: 1.55;
+    color: var(--paper);
+    text-align: center;
+    text-wrap: balance;
+  }
+  .manifesto p { margin: 0; }
+
   /* prose */
   .prose {
     max-width: var(--measure);
@@ -287,6 +311,8 @@
       </svg>
     </div>
 
+    <p class="drag-hint" aria-hidden="true">drag to cut</p>
+
     <div class="badge-row reveal r4">
       <!-- Coming-soon placeholder. Swap href for the live App Store URL and the badge
            graphic for Apple's official "Download on the App Store" SVG when ready. -->
@@ -311,6 +337,11 @@
     <p>Drag a line across an abstract shape. Cut it into two perfectly balanced halves. As few lines as possible.</p>
     <p>34 hand-crafted levels. A daily procgen puzzle. An unlockable endless mode. iPhone and iPad, iOS 17 and later.</p>
   </section>
+
+  <aside class="manifesto reveal r6" aria-labelledby="manifesto-heading">
+    <h2 id="manifesto-heading" class="sr-only">Position</h2>
+    <p>A premium puzzle game. Bought once, played at your pace. No streaks, no daily nudges, no engagement metrics tugging at your sleeve. Just the work of finding the cut, and then putting the phone down.</p>
+  </aside>
 
   <p class="colophon reveal r6">
     Built solo by Erik Nielsen, Stockholm. <a href="https://sorkila.com">sorkila.com</a>
@@ -402,6 +433,21 @@
     figure.style.cursor = 'default';
     figure.style.touchAction = 'auto';
   } else {
+    /* Drag affordance: most visitors won't realise the figure is interactive.
+       Fade in a small "drag to cut" caption after a short idle, hide it after
+       any successful interaction (and persist that across visits in this tab). */
+    const dragHint = document.querySelector('.drag-hint');
+    let dragRevealed = false;
+    try { dragRevealed = sessionStorage.getItem('dela-dragged') === '1'; } catch (_) {}
+    if (dragHint && !dragRevealed) {
+      setTimeout(() => { if (!dragRevealed) dragHint.classList.add('show'); }, 6000);
+    }
+    function markDragged() {
+      dragRevealed = true;
+      if (dragHint) dragHint.classList.remove('show');
+      try { sessionStorage.setItem('dela-dragged', '1'); } catch (_) {}
+    }
+
     let pointerDown = false;
     let pointerId = null;
     let startY = 0;
@@ -480,6 +526,7 @@
       if (!pointerDown || (e && e.pointerId !== pointerId)) return;
       pointerDown = false;
       pointerId = null;
+      markDragged();
       release();
     }
     figure.addEventListener('pointerup', up);
