@@ -5,8 +5,9 @@
 <title>Dela — the art of dividing</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Dela is a minimalist iOS puzzle game. Cut abstract shapes into two perfectly balanced halves with as few straight lines as possible.">
-<meta name="theme-color" content="#131110">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#131110" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
 <link rel="canonical" href="https://dela.app/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Dela — the art of dividing">
@@ -17,6 +18,7 @@
 <meta name="twitter:title" content="Dela — the art of dividing">
 <meta name="twitter:description" content="A minimalist iOS puzzle game about cutting abstract shapes into two perfectly balanced halves.">
 <meta name="twitter:image" content="https://dela.app/og.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -46,8 +48,8 @@
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(900px 540px at 50% 8%, rgba(232, 230, 225, 0.04) 0%, transparent 60%),
-      radial-gradient(620px 360px at 50% 8%, rgba(232, 230, 225, 0.025) 0%, transparent 70%);
+      radial-gradient(900px 540px at 50% 8%, rgba(var(--paper-rgb), 0.04) 0%, transparent 60%),
+      radial-gradient(620px 360px at 50% 8%, rgba(var(--paper-rgb), 0.025) 0%, transparent 70%);
     z-index: 0;
   }
 
@@ -100,6 +102,7 @@
   .hg-top { animation: top-drift 11s -2.75s infinite; }
   .hg-bot { animation: bot-drift 11s -2.75s infinite; }
   .hg-cut {
+    color: var(--paper);
     stroke-dasharray: 200;
     stroke-dashoffset: 200;
     opacity: 0;
@@ -152,7 +155,7 @@
     border: 1px solid var(--surface);
     border-radius: 12px;
     color: var(--paper);
-    background: linear-gradient(180deg, rgba(232,230,225,0.025) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.025) 0%, transparent 100%);
     text-decoration: none;
     min-height: 52px;
     line-height: 1.1;
@@ -196,14 +199,21 @@
     border: 1px solid var(--surface);
     overflow: hidden;
     isolation: isolate;
+    opacity: 0;
+    animation: shotReveal 1s var(--ease) forwards;
   }
+  .shot:nth-child(1) { animation-delay: 1.10s; }
+  .shot:nth-child(2) { animation-delay: 1.20s; }
+  .shot:nth-child(3) { animation-delay: 1.30s; }
+  .shot:nth-child(4) { animation-delay: 1.40s; }
+  @keyframes shotReveal { to { opacity: 1; } }
   .shot::before {
     content: '';
     position: absolute;
     inset: 5px;
     border-radius: 26px;
     background:
-      radial-gradient(120% 60% at 50% 0%, rgba(232,230,225,0.04) 0%, transparent 60%),
+      radial-gradient(120% 60% at 50% 0%, rgba(var(--paper-rgb), 0.04) 0%, transparent 60%),
       var(--bg);
     z-index: 0;
   }
@@ -233,6 +243,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; animation: none; }
+    .shot { opacity: 1; animation: none; }
     .hg-top, .hg-bot { animation: none; }
     .hg-top { transform: translate(0, -7px); }
     .hg-bot { transform: translate(0, 7px); }
@@ -268,7 +279,7 @@
           <rect class="cell cell--bot" x="78"  y="117" width="36" height="36"/>
           <rect class="cell cell--bot" x="117" y="117" width="36" height="36"/>
         </g>
-        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="#E8E6E1" stroke-width="0.8" stroke-linecap="round" pathLength="200"/>
+        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" pathLength="200"/>
       </svg>
     </div>
 
@@ -293,15 +304,15 @@
 
   <section class="prose reveal r5" aria-labelledby="about-heading">
     <h2 id="about-heading" class="sr-only">About Dela</h2>
-    <p>Drag your finger across an abstract shape to cut it into two perfectly balanced halves. Use as few straight lines as possible.</p>
-    <p>34 hand-crafted curriculum levels, a daily procgen puzzle, and an unlockable endless mode. iPhone and iPad. iOS 17 and later.</p>
+    <p>Drag a line across an abstract shape. Cut it into two perfectly balanced halves. As few lines as possible.</p>
+    <p>34 hand-crafted levels. A daily procgen puzzle. An unlockable endless mode. iPhone and iPad, iOS 17 and later.</p>
   </section>
 
   <section aria-labelledby="screenshots-heading">
     <h2 id="screenshots-heading" class="sr-only">Screenshots</h2>
     <!-- 4 in-game screenshots at iPhone 6.7" resolution. Replace each .shot block with
          <div class="shot"><img src="/screenshots/0X.jpg" alt="..."></div> when assets land. -->
-    <div class="shots reveal r6" role="list" aria-label="Screenshots">
+    <div class="shots" role="list" aria-label="Screenshots">
       <div class="shot" role="listitem"></div>
       <div class="shot" role="listitem"></div>
       <div class="shot" role="listitem"></div>

@@ -4,6 +4,7 @@
 :root {
   --bg: #131110;
   --paper: #E8E6E1;
+  --paper-rgb: 232, 230, 225;
   --mid: #9A9590;
   --muted: #8B857C;
   --surface: #322F2C;
@@ -12,6 +13,22 @@
   --max: 760px;
   --max-narrow: 640px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Optional light variant. Dark is canonical (per brief).
+   Tones are tuned for WCAG AA on the light bg, not just mirrored from the brief's
+   recommendation - the literal "secondary #7A756D" only reaches 4.18:1 on #F5F4F0,
+   which fails AA for normal text. These pass. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #F5F4F0;
+    --paper: #1A1A1A;
+    --paper-rgb: 26, 26, 26;
+    --mid: #6B6655;
+    --muted: #7C7766;
+    --surface: #E0DDD4;
+    --surface-2: #ECEAE2;
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -29,7 +46,7 @@ body {
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
-::selection { background: rgba(232, 230, 225, 0.18); color: var(--paper); }
+::selection { background: rgba(var(--paper-rgb), 0.18); color: var(--paper); }
 
 .sr-only {
   position: absolute;

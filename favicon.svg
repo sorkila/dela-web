@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .top { fill: #E8E6E1; }
+    .bot { fill: #9A9590; }
+    @media (prefers-color-scheme: light) {
+      .top { fill: #1A1A1A; }
+      .bot { fill: #6B6655; }
+    }
+  </style>
+  <rect class="top" x="1"  y="1"  width="14" height="14" rx="2"/>
+  <rect class="top" x="17" y="1"  width="14" height="14" rx="2"/>
+  <rect class="bot" x="1"  y="17" width="14" height="14" rx="2"/>
+  <rect class="bot" x="17" y="17" width="14" height="14" rx="2"/>
+</svg>
