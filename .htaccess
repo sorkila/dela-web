@@ -1,0 +1,25 @@
+# dela-web server config.
+# Inleed serves via nginx in front of Apache; this file applies on the Apache layer.
+# If a directive doesn't take effect, the same setting needs toggling in Inleed's
+# control panel (Force HTTPS, custom 404, security headers).
+
+# --- Force HTTPS ---
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# --- Security headers ---
+<IfModule mod_headers.c>
+  # Tell browsers to remember to use HTTPS for the next year.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  # Prevent MIME-type sniffing.
+  Header set X-Content-Type-Options "nosniff"
+  # Send only the origin on cross-site nav, full referrer same-origin.
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --- Branded 404 ---
+ErrorDocument 404 /404.html

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dela.app/sitemap.xml
+Sitemap: https://playdela.com/sitemap.xml

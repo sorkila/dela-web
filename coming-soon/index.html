@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coming soon — Dela</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Dela is coming to the App Store.">
+<meta name="theme-color" content="#131110" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://playdela.com/coming-soon/">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="6dcc31dc-88bf-40f4-b641-b362c6f1867d"></script>
+<style>
+  :root {
+    --bg: #131110;
+    --paper: #E8E6E1;
+    --mid: #9A9590;
+    --muted: #8B857C;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #F5F4F0;
+      --paper: #1A1A1A;
+      --mid: #6B6655;
+      --muted: #7C7766;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--paper);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    padding: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
+  }
+  main { animation: fade 0.7s var(--ease) both; max-width: 420px; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  h1 {
+    font-family: 'Pirata One', serif;
+    font-weight: 400;
+    font-size: clamp(72px, 14vw, 120px);
+    line-height: 0.95;
+    margin: 0 0 14px;
+    color: var(--paper);
+  }
+  .tagline { font-style: italic; color: var(--mid); font-size: 16px; letter-spacing: 0.01em; margin: 0 0 36px; }
+  .label {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .lead { color: var(--paper); font-size: 17px; line-height: 1.6; margin: 0 0 32px; }
+  a { color: var(--paper); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(232,230,225,0.25); transition: text-decoration-color 0.4s var(--ease); }
+  @media (hover: hover) { a:hover { text-decoration-color: var(--mid); } }
+  a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; border-radius: 2px; }
+
+  @media (prefers-reduced-motion: reduce) { main { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>dela</h1>
+  <p class="tagline">the art of dividing.</p>
+  <p class="label">Coming soon</p>
+  <p class="lead">Dela is being prepared for App Store submission. Check back soon, or follow along at <a href="https://sorkila.com">sorkila.com</a>.</p>
+  <p><a href="/">return home</a></p>
+</main>
+</body>
+</html>
