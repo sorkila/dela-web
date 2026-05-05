@@ -110,24 +110,53 @@
     width: min(300px, 64vw);
     aspect-ratio: 1 / 1;
     margin: clamp(56px, 9vw, 88px) auto clamp(40px, 6vw, 64px);
+    overflow: visible;
   }
-  .hero-figure svg { width: 100%; height: 100%; display: block; }
+  .hero-figure svg { width: 100%; height: 100%; display: block; overflow: visible; }
   .cell { fill: var(--paper); rx: 2; }
   .cell--bot { fill: var(--mid); }
-  .hg-top { animation: drift-top 8s ease-in-out infinite; }
-  .hg-bot { animation: drift-bot 8s ease-in-out infinite; }
-  .hg-cut { animation: cut-pulse 8s ease-in-out infinite; }
-  @keyframes drift-top {
-    0%, 18%, 82%, 100% { transform: translate(0, 0); }
-    44%, 56% { transform: translate(0, -10px); }
+
+  /*
+   * 11s narrative cycle, deliberate pacing:
+   *   0 - 22%  rest
+   *  22 - 28%  cut line is drawn left to right (the moment of intention)
+   *  28 - 45%  halves separate, exponential ease-out (snap and settle)
+   *  45 - 64%  held apart in stillness
+   *  64 - 82%  halves rejoin, softly accelerating ease-in-out
+   *  82 - 88%  cut line fades (the cut "heals")
+   *  88 - 100% rest
+   * No scale anywhere — only translation. Cells keep their size.
+   */
+  .hg-top { animation: top-drift 11s infinite; }
+  .hg-bot { animation: bot-drift 11s infinite; }
+  .hg-cut {
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    opacity: 0;
+    animation: cut-line 11s infinite;
   }
-  @keyframes drift-bot {
-    0%, 18%, 82%, 100% { transform: translate(0, 0); }
-    44%, 56% { transform: translate(0, 10px); }
+  @keyframes top-drift {
+    0%   { transform: translate(0, 0); animation-timing-function: linear; }
+    28%  { transform: translate(0, 0); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+    45%  { transform: translate(0, -14px); animation-timing-function: linear; }
+    64%  { transform: translate(0, -14px); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    82%  { transform: translate(0, 0); animation-timing-function: linear; }
+    100% { transform: translate(0, 0); }
   }
-  @keyframes cut-pulse {
-    0%, 18%, 82%, 100% { opacity: 0; }
-    44%, 56% { opacity: 0.55; }
+  @keyframes bot-drift {
+    0%   { transform: translate(0, 0); animation-timing-function: linear; }
+    28%  { transform: translate(0, 0); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+    45%  { transform: translate(0, 14px); animation-timing-function: linear; }
+    64%  { transform: translate(0, 14px); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+    82%  { transform: translate(0, 0); animation-timing-function: linear; }
+    100% { transform: translate(0, 0); }
+  }
+  @keyframes cut-line {
+    0%, 22% { stroke-dashoffset: 200; opacity: 0; animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+    28%     { stroke-dashoffset: 0;   opacity: 0.55; animation-timing-function: linear; }
+    82%     { stroke-dashoffset: 0;   opacity: 0.55; animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1); }
+    88%     { stroke-dashoffset: 0;   opacity: 0; animation-timing-function: linear; }
+    100%    { stroke-dashoffset: 200; opacity: 0; }
   }
 
   /* --- App Store badge --- */
@@ -257,9 +286,9 @@
     html { scroll-behavior: auto; }
     .reveal { opacity: 1; transform: none; animation: none; }
     .hg-top, .hg-bot { animation: none; }
-    .hg-top { transform: translate(0, -5px); }
-    .hg-bot { transform: translate(0, 5px); }
-    .hg-cut { animation: none; opacity: 0.4; }
+    .hg-top { transform: translate(0, -7px); }
+    .hg-bot { transform: translate(0, 7px); }
+    .hg-cut { animation: none; opacity: 0.4; stroke-dashoffset: 0; }
     .app-badge, a { transition: none; }
   }
 </style>
@@ -273,7 +302,7 @@
 
     <!-- Hero visual: 12-cell hourglass polyomino. Cells drift apart along the horizontal cut. Swap for hero.mp4 / hero.gif when delivered. -->
     <div class="hero-figure reveal r3" aria-hidden="true">
-      <svg viewBox="0 0 153 153" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 153 153" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <!-- top half: row 0 (4 cells) + row 1 (2 cells inset) -->
         <g class="hg-top">
           <rect class="cell" x="0"   y="0"  width="36" height="36"/>
@@ -293,7 +322,7 @@
           <rect class="cell cell--bot" x="117" y="117" width="36" height="36"/>
         </g>
         <!-- the cut: thin paper-white line that fades in only at separation -->
-        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="#E8E6E1" stroke-width="1" stroke-linecap="round"/>
+        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="#E8E6E1" stroke-width="0.8" stroke-linecap="round" pathLength="200"/>
       </svg>
     </div>
 
