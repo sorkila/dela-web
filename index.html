@@ -95,13 +95,37 @@
     user-select: none;
   }
   .hero-figure svg { width: 100%; height: 100%; display: block; overflow: visible; }
-  .cell { fill: var(--paper); rx: 2; }
-  .cell--bot { fill: var(--mid); }
+  /* Group-level fill is inheritable; this lets bot-flip animate on the group
+     so its rhythm survives child rebuilds (shape swaps don't desync the color). */
+  .hg-top { fill: var(--paper); }
+  .hg-bot { fill: var(--paper); }
+  .cell { rx: 2; opacity: 0; animation: cell-reveal 0.45s var(--ease) var(--reveal-delay, 0s) forwards; }
+  /* per-cell stagger; nth-child applies inside each <g>, so top and bot stagger
+     independently and the bottom half follows the top. */
+  .hg-top .cell:nth-child(1) { --reveal-delay: 0.30s; }
+  .hg-top .cell:nth-child(2) { --reveal-delay: 0.36s; }
+  .hg-top .cell:nth-child(3) { --reveal-delay: 0.42s; }
+  .hg-top .cell:nth-child(4) { --reveal-delay: 0.48s; }
+  .hg-top .cell:nth-child(5) { --reveal-delay: 0.54s; }
+  .hg-top .cell:nth-child(6) { --reveal-delay: 0.60s; }
+  .hg-bot .cell:nth-child(1) { --reveal-delay: 0.66s; }
+  .hg-bot .cell:nth-child(2) { --reveal-delay: 0.72s; }
+  .hg-bot .cell:nth-child(3) { --reveal-delay: 0.78s; }
+  .hg-bot .cell:nth-child(4) { --reveal-delay: 0.84s; }
+  .hg-bot .cell:nth-child(5) { --reveal-delay: 0.90s; }
+  .hg-bot .cell:nth-child(6) { --reveal-delay: 0.96s; }
+  @keyframes cell-reveal { to { opacity: 1; } }
 
   /* 11s narrative cycle. animation-delay: -2.75s starts at the cut-drawing moment on first paint
      so the user sees motion immediately rather than 2.5s of static rest. */
-  .hg-top { animation: top-drift 11s -2.75s infinite; }
-  .hg-bot { animation: bot-drift 11s -2.75s infinite; }
+  .hg-top { animation: top-drift 11s -2.75s infinite, top-shadow 11s -2.75s infinite; }
+  .hg-bot {
+    animation:
+      bot-drift 11s -2.75s infinite,
+      bot-shadow 11s -2.75s infinite,
+      bot-flip 11s -2.75s infinite;
+  }
+  .hg-top, .hg-bot { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
   .hg-cut {
     color: var(--paper);
     stroke-dasharray: 200;
@@ -110,26 +134,48 @@
     animation: cut-line 11s -2.75s infinite;
   }
   @keyframes top-drift {
-    0%   { transform: translate(0, 0); animation-timing-function: linear; }
-    28%  { transform: translate(0, 0); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+    0%   { transform: translate(0, 0);    animation-timing-function: linear; }
+    28%  { transform: translate(0, 0);    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
     45%  { transform: translate(0, -14px); animation-timing-function: linear; }
-    64%  { transform: translate(0, -14px); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    82%  { transform: translate(0, 0); animation-timing-function: linear; }
+    64%  { transform: translate(0, -14px); animation-timing-function: cubic-bezier(0.7, 0, 0.5, 1); }
+    73%  { transform: translate(0, 0);    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    77%  { transform: translate(0, -1.5px); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); } /* elastic recoil at contact */
+    82%  { transform: translate(0, 0);    animation-timing-function: linear; }
     100% { transform: translate(0, 0); }
   }
   @keyframes bot-drift {
-    0%   { transform: translate(0, 0); animation-timing-function: linear; }
-    28%  { transform: translate(0, 0); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+    0%   { transform: translate(0, 0);    animation-timing-function: linear; }
+    28%  { transform: translate(0, 0);    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
     45%  { transform: translate(0, 14px); animation-timing-function: linear; }
-    64%  { transform: translate(0, 14px); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
-    82%  { transform: translate(0, 0); animation-timing-function: linear; }
+    64%  { transform: translate(0, 14px); animation-timing-function: cubic-bezier(0.7, 0, 0.5, 1); }
+    73%  { transform: translate(0, 0);   animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    77%  { transform: translate(0, 1.5px); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+    82%  { transform: translate(0, 0);   animation-timing-function: linear; }
     100% { transform: translate(0, 0); }
   }
+  @keyframes top-shadow {
+    0%, 28%   { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+    45%, 64%  { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.42)); }
+    82%, 100% { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+  }
+  @keyframes bot-shadow {
+    0%, 28%   { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+    45%, 64%  { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.42)); }
+    82%, 100% { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+  }
+  @keyframes bot-flip {
+    /* same color as top before/after; shifts to mid through the separation phase.
+       Transition timing aligns with drift: cut + separate (28-36%), held (36-64%),
+       rejoin (64-73%), settled (73-100%). */
+    0%, 28%   { fill: var(--paper); }
+    36%, 64%  { fill: var(--mid); }
+    73%, 100% { fill: var(--paper); }
+  }
   @keyframes cut-line {
-    0%, 22% { stroke-dashoffset: 200; opacity: 0; animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+    0%, 22% { stroke-dashoffset: 200; opacity: 0;    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
     28%     { stroke-dashoffset: 0;   opacity: 0.55; animation-timing-function: linear; }
-    82%     { stroke-dashoffset: 0;   opacity: 0.55; animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1); }
-    88%     { stroke-dashoffset: 0;   opacity: 0; animation-timing-function: linear; }
+    64%     { stroke-dashoffset: 0;   opacity: 0.55; animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1); }
+    73%     { stroke-dashoffset: 0;   opacity: 0;    animation-timing-function: linear; } /* heals as halves meet */
     100%    { stroke-dashoffset: 200; opacity: 0; }
   }
 
@@ -143,7 +189,9 @@
     transition:
       transform 0.5s var(--ease),
       opacity 0.35s var(--ease),
-      stroke-dashoffset 0.35s var(--ease);
+      stroke-dashoffset 0.35s var(--ease),
+      fill 0.35s var(--ease),
+      filter 0.35s var(--ease);
   }
 
   /* badge */
@@ -245,7 +293,9 @@
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; animation: none; }
     .shot { opacity: 1; animation: none; }
-    .hg-top, .hg-bot { animation: none; }
+    .cell { opacity: 1; animation: none; }
+    .hg-top, .hg-bot { animation: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .hg-bot { fill: var(--mid); }
     .hg-top { transform: translate(0, -7px); }
     .hg-bot { transform: translate(0, 7px); }
     .hg-cut { animation: none; opacity: 0.4; stroke-dashoffset: 0; }
@@ -338,86 +388,162 @@
 </main>
 
 <script>
-/* Hero drag-to-cut interaction.
-   The auto loop runs by default. When the visitor drags the figure vertically,
-   the JS pauses the loop, follows the pointer, then animates a clean cut +
-   separation + close before handing back to the loop. */
+/* Hero animation system.
+   - Three shapes rotate on each 11s animation iteration: hourglass, plus, staircase.
+   - Drag-to-cut: pointer captures pause the auto loop and let the visitor produce
+     the cut themselves, with the same separation, color flip, and shadow lift.
+   Cells are rebuilt as <rect>s on each shape swap so cell-reveal staggers cleanly. */
 (() => {
   const figure = document.getElementById('hero-figure');
   if (!figure) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const top = figure.querySelector('.hg-top');
   const bot = figure.querySelector('.hg-bot');
   const cut = figure.querySelector('.hg-cut');
   if (!top || !bot || !cut) return;
 
-  let pointerDown = false;
-  let pointerId = null;
-  let startY = 0;
-  let queued = null;
+  /* Each shape: cells laid out on a 4x4 grid with cells 36 units, 3 unit gap
+     (cell pitch = 39). cutY is the horizontal cut line position in viewBox units. */
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const CELL = 36, PITCH = 39;
+  const shapes = [
+    { /* hourglass: 4 + 2 / 2 + 4 */
+      top: [[0,0],[1,0],[2,0],[3,0],[1,1],[2,1]],
+      bot: [[1,2],[2,2],[0,3],[1,3],[2,3],[3,3]],
+      cutY: 76.5,
+    },
+    { /* plus: 2 + 4 / 4 + 2 */
+      top: [[1,0],[2,0],[0,1],[1,1],[2,1],[3,1]],
+      bot: [[0,2],[1,2],[2,2],[3,2],[1,3],[2,3]],
+      cutY: 76.5,
+    },
+    { /* staircase: 2 + 3 / 3 + 2 */
+      top: [[0,0],[1,0],[0,1],[1,1],[2,1]],
+      bot: [[1,2],[2,2],[3,2],[2,3],[3,3]],
+      cutY: 76.5,
+    },
+  ];
 
-  function paint(progress) {
-    const eased = Math.max(0, Math.min(1, progress));
-    const offset = eased * 14;
-    top.style.transform = `translate(0, ${-offset}px)`;
-    bot.style.transform = `translate(0, ${offset}px)`;
-    const lineProgress = Math.min(1, eased * 1.8);
-    cut.style.opacity = lineProgress * 0.55;
-    cut.style.strokeDashoffset = (1 - lineProgress) * 200;
+  let shapeIndex = 0;
+
+  function buildCells(g, list, isBot) {
+    g.replaceChildren();
+    for (const [c, r] of list) {
+      const rect = document.createElementNS(SVG_NS, 'rect');
+      rect.setAttribute('class', isBot ? 'cell cell--bot' : 'cell');
+      rect.setAttribute('x', c * PITCH);
+      rect.setAttribute('y', r * PITCH);
+      rect.setAttribute('width', CELL);
+      rect.setAttribute('height', CELL);
+      g.appendChild(rect);
+    }
   }
 
-  function clearInline() {
-    top.style.transform = '';
-    bot.style.transform = '';
-    cut.style.opacity = '';
-    cut.style.strokeDashoffset = '';
-    /* Drop the negative animation-delay on resume so the auto cycle picks up
-       cleanly from the closed state instead of jumping to mid-cut. */
-    top.style.animationDelay = '0s';
-    bot.style.animationDelay = '0s';
-    cut.style.animationDelay = '0s';
-    delete figure.dataset.mode;
+  function paintShape(idx) {
+    const s = shapes[idx];
+    buildCells(top, s.top, false);
+    buildCells(bot, s.bot, true);
+    cut.setAttribute('y1', s.cutY);
+    cut.setAttribute('y2', s.cutY);
   }
 
-  function release() {
-    figure.dataset.mode = 'manual';
-    paint(1);
-    queued && clearTimeout(queued);
-    queued = setTimeout(() => {
-      paint(0);
+  paintShape(0);
+
+  /* Advance shape on each top-drift iteration boundary (start of new 11s cycle). */
+  top.addEventListener('animationiteration', (e) => {
+    if (e.animationName !== 'top-drift') return;
+    shapeIndex = (shapeIndex + 1) % shapes.length;
+    paintShape(shapeIndex);
+  });
+
+  /* Drag-to-cut. Skipped under reduced-motion so the static figure isn't disturbed. */
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    figure.style.cursor = 'default';
+    figure.style.touchAction = 'auto';
+  } else {
+    let pointerDown = false;
+    let pointerId = null;
+    let startY = 0;
+    let queued = null;
+
+    function lerpFill(p) {
+      /* paper -> mid via color-mix; respects light-mode overrides automatically. */
+      return `color-mix(in srgb, var(--paper), var(--mid) ${p * 100}%)`;
+    }
+
+    function paint(progress) {
+      const eased = Math.max(0, Math.min(1, progress));
+      const offset = eased * 14;
+      top.style.transform = `translate(0, ${-offset}px)`;
+      bot.style.transform = `translate(0, ${offset}px)`;
+      const lineProgress = Math.min(1, eased * 1.8);
+      cut.style.opacity = lineProgress * 0.55;
+      cut.style.strokeDashoffset = (1 - lineProgress) * 200;
+      bot.style.fill = lerpFill(eased);
+      const blur = 2 + eased * 8;
+      const dy = 1 + eased * 5;
+      const opacity = 0.22 + eased * 0.20;
+      const shadow = `drop-shadow(0 ${dy}px ${blur}px rgba(0,0,0,${opacity}))`;
+      top.style.filter = shadow;
+      bot.style.filter = shadow;
+    }
+
+    function clearInline() {
+      top.style.transform = '';
+      bot.style.transform = '';
+      cut.style.opacity = '';
+      cut.style.strokeDashoffset = '';
+      top.style.filter = '';
+      bot.style.filter = '';
+      bot.style.fill = '';
+      /* Drop the negative animation-delay on resume so the auto cycle picks up
+         cleanly from the closed state instead of jumping to mid-cut.
+         top has 2 animations (drift, shadow); bot has 3 (drift, shadow, flip). */
+      top.style.animationDelay = '0s, 0s';
+      bot.style.animationDelay = '0s, 0s, 0s';
+      cut.style.animationDelay = '0s';
+      delete figure.dataset.mode;
+    }
+
+    function release() {
+      figure.dataset.mode = 'manual';
+      paint(1);
+      queued && clearTimeout(queued);
       queued = setTimeout(() => {
-        clearInline();
-        queued = null;
-      }, 700);
-    }, 1600);
+        paint(0);
+        queued = setTimeout(() => {
+          clearInline();
+          queued = null;
+        }, 700);
+      }, 1600);
+    }
+
+    figure.addEventListener('pointerdown', (e) => {
+      pointerDown = true;
+      pointerId = e.pointerId;
+      if (queued) { clearTimeout(queued); queued = null; }
+      figure.dataset.mode = 'manual';
+      startY = e.clientY;
+      paint(0);
+      try { figure.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault();
+    });
+
+    figure.addEventListener('pointermove', (e) => {
+      if (!pointerDown || e.pointerId !== pointerId) return;
+      const dist = Math.abs(e.clientY - startY);
+      paint(dist / 80);
+    });
+
+    function up(e) {
+      if (!pointerDown || (e && e.pointerId !== pointerId)) return;
+      pointerDown = false;
+      pointerId = null;
+      release();
+    }
+    figure.addEventListener('pointerup', up);
+    figure.addEventListener('pointercancel', up);
   }
-
-  figure.addEventListener('pointerdown', (e) => {
-    pointerDown = true;
-    pointerId = e.pointerId;
-    if (queued) { clearTimeout(queued); queued = null; }
-    figure.dataset.mode = 'manual';
-    startY = e.clientY;
-    paint(0);
-    try { figure.setPointerCapture(e.pointerId); } catch (_) {}
-    e.preventDefault();
-  });
-
-  figure.addEventListener('pointermove', (e) => {
-    if (!pointerDown || e.pointerId !== pointerId) return;
-    const dist = Math.abs(e.clientY - startY);
-    paint(dist / 80);
-  });
-
-  function up(e) {
-    if (!pointerDown || (e && e.pointerId !== pointerId)) return;
-    pointerDown = false;
-    pointerId = null;
-    release();
-  }
-  figure.addEventListener('pointerup', up);
-  figure.addEventListener('pointercancel', up);
 })();
 
 /* console */
