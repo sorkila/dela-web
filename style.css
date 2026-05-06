@@ -34,7 +34,7 @@
   --bg: #131110;
   --paper: #E8E6E1;
   --paper-rgb: 232, 230, 225;
-  --mid: #9A9590;
+  --mid: #A8A39E;          /* bumped from #9A9590 to clear AAA on --bg */
   --muted: #8B857C;
   --surface: #322F2C;
   --surface-2: #221F1D;
@@ -42,6 +42,10 @@
   --max: 760px;
   --max-narrow: 640px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Spotlight position. JS on the home page lerps these toward the cursor;
+     subpages keep the static defaults. */
+  --spot-x: 50%;
+  --spot-y: 32%;
 }
 
 /* Optional light variant. Dark is canonical (per brief).
@@ -53,7 +57,7 @@
     --bg: #F5F4F0;
     --paper: #1A1A1A;
     --paper-rgb: 26, 26, 26;
-    --mid: #6B6655;
+    --mid: #5C574A;        /* darkened from #6B6655 to clear AAA on --bg */
     --muted: #7C7766;
     --surface: #E0DDD4;
     --surface-2: #ECEAE2;
@@ -80,6 +84,48 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 ::selection { background: rgba(var(--paper-rgb), 0.18); color: var(--paper); }
+
+/* Shared lighting. Spotlight glow + sub-perceptual paper-grain overlay reach
+   every page, so the brand world doesn't disappear when you click into a
+   subpage. The home's JS lerps --spot-x/--spot-y toward the cursor; subpages
+   keep the static defaults. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(1100px 660px at var(--spot-x) var(--spot-y), rgba(var(--paper-rgb), 0.05) 0%, transparent 60%),
+    radial-gradient(700px 400px at var(--spot-x) var(--spot-y), rgba(var(--paper-rgb), 0.028) 0%, transparent 70%);
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+@media (prefers-reduced-transparency: reduce) {
+  body::after { display: none; }
+}
+
+/* Cross-page navigation fade. Browsers that don't support View Transitions
+   fall back to a normal navigation; everywhere else gets a 240ms cross-fade
+   that makes the site feel like one document instead of five. */
+@view-transition { navigation: auto; }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.24s;
+  animation-timing-function: var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}
 
 .sr-only {
   position: absolute;
@@ -127,14 +173,47 @@ body {
   to   { opacity: 1; transform: none; }
 }
 .wrap--narrow > * { animation: pageReveal 0.7s var(--ease) both; }
-.wrap--narrow > *:nth-child(1) { animation-delay: 0.05s; }
-.wrap--narrow > *:nth-child(2) { animation-delay: 0.15s; }
-.wrap--narrow > *:nth-child(3) { animation-delay: 0.25s; }
-.wrap--narrow > *:nth-child(n+4) { animation-delay: 0.30s; }
+.wrap--narrow > *:nth-child(1)   { animation-delay: 0.05s; }
+.wrap--narrow > *:nth-child(2)   { animation-delay: 0.15s; }
+.wrap--narrow > *:nth-child(3)   { animation-delay: 0.22s; }
+.wrap--narrow > *:nth-child(4)   { animation-delay: 0.28s; }
+.wrap--narrow > *:nth-child(5)   { animation-delay: 0.33s; }
+.wrap--narrow > *:nth-child(6)   { animation-delay: 0.37s; }
+.wrap--narrow > *:nth-child(7)   { animation-delay: 0.40s; }
+.wrap--narrow > *:nth-child(8)   { animation-delay: 0.42s; }
+.wrap--narrow > *:nth-child(n+9) { animation-delay: 0.44s; }
 
-.crumb { font-size: 14px; color: var(--mid); margin-bottom: 32px; }
-.crumb a { color: var(--mid); text-decoration: none; }
-@media (hover: hover) { .crumb a:hover { color: var(--paper); } }
+/* Crumb — the only navigation chrome on subpages, also the only place that
+   carries the wordmark identity to the rest of the site. The "dela" set in
+   Pirata at a small size reads as a tiny logo mark. Arrow translates left
+   on hover so the visitor feels the back-link before they click. */
+.crumb {
+  font-size: 14px;
+  color: var(--mid);
+  margin-bottom: 36px;
+}
+.crumb a {
+  color: var(--mid);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.crumb .arr {
+  font-family: 'Inter', sans-serif;
+  display: inline-block;
+  transition: transform 0.4s var(--ease);
+}
+.crumb .mark {
+  font-family: 'Pirata One', serif;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0.005em;
+}
+@media (hover: hover) {
+  .crumb a:hover { color: var(--paper); }
+  .crumb a:hover .arr { transform: translateX(-3px); }
+}
 
 .wrap--narrow h1 {
   font-family: 'Inter', sans-serif;
@@ -146,6 +225,9 @@ body {
   margin: 0 0 24px;
   color: var(--paper);
 }
+/* Subpage section labels gain a 28px hairline rule so each h2 reads as a
+   composed divider rather than another piece of body text. The rule sits
+   on the baseline; tracking is unchanged. */
 .wrap--narrow h2 {
   font-family: 'Inter', sans-serif;
   text-transform: uppercase;
@@ -153,7 +235,18 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: var(--mid);
-  margin: 40px 0 16px;
+  margin: 48px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.wrap--narrow h2::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: var(--surface);
+  flex-shrink: 0;
 }
 
 p { margin: 0 0 18px; text-wrap: pretty; }

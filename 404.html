@@ -12,39 +12,32 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/pirata-one-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
 <script defer src="https://cloud.umami.is/script.js" data-website-id="6dcc31dc-88bf-40f4-b641-b362c6f1867d"></script>
 <style>
-  :root {
-    --bg: #131110;
-    --paper: #E8E6E1;
-    --mid: #9A9590;
-    --muted: #8B857C;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #F5F4F0;
-      --paper: #1A1A1A;
-      --mid: #6B6655;
-      --muted: #7C7766;
-    }
-  }
-  *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; height: 100%; }
   body {
-    font-family: 'Inter', -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--paper);
     display: grid;
     place-items: center;
+    min-height: 100dvh;
     text-align: center;
-    -webkit-font-smoothing: antialiased;
-    padding: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
+    padding:
+      max(24px, env(safe-area-inset-top, 0px))
+      max(24px, env(safe-area-inset-right, 0px))
+      max(24px, env(safe-area-inset-bottom, 0px))
+      max(24px, env(safe-area-inset-left, 0px));
   }
-  main { animation: fade 0.7s var(--ease) both; }
+  main {
+    position: relative;
+    z-index: 1;
+    animation: fade 0.7s var(--ease) both;
+  }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-  /* a small shape that didn't quite balance */
+  /* "Didn't quite balance" — two paper bars, the right one slightly low and
+     slowly oscillating. Reads as "still searching for balance" rather than
+     a static drawing. */
   .unbalanced {
     width: 96px;
     height: 36px;
@@ -59,7 +52,16 @@
     background: var(--paper);
   }
   .unbalanced .l { flex: 1; }
-  .unbalanced .r { flex: 0.55; background: var(--mid); transform: translateY(6px); }
+  .unbalanced .r {
+    flex: 0.55;
+    background: var(--mid);
+    transform: translateY(6px);
+    animation: tip 5s ease-in-out 1.2s infinite;
+  }
+  @keyframes tip {
+    0%, 100% { transform: translateY(6px); }
+    50%      { transform: translateY(9px); }
+  }
 
   h1 {
     font-family: 'Pirata One', serif;
@@ -70,12 +72,10 @@
     color: var(--paper);
   }
   p { color: var(--muted); margin: 14px 0 0; font-size: 16px; }
-  a { color: var(--paper); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(232,230,225,0.25); transition: text-decoration-color 0.4s var(--ease); }
-  @media (hover: hover) { a:hover { text-decoration-color: var(--mid); } }
-  a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; border-radius: 2px; }
 
   @media (prefers-reduced-motion: reduce) {
     main { animation: none; }
+    .unbalanced .r { animation: none; }
   }
 </style>
 </head>
