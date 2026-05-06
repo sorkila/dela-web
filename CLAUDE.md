@@ -237,6 +237,32 @@ The site uses **Umami Cloud** for aggregate, cookieless visit counting:
 
 Don't add additional analytics, pixels, or tracking SDKs. The privacy disclosure must stay aligned with whatever the site actually does.
 
+### iOS app behaviour the site asserts
+
+The privacy and support pages make specific claims about how the shipping iOS app behaves. App Store reviewers read these pages, so the claims must match the build. If the iOS app changes, update the page first.
+
+**Privacy page (`/privacy/`) asserts:**
+
+- No user accounts.
+- No server connection. Fully offline.
+- No third-party analytics or advertising SDKs.
+- UserDefaults stores only: level progress and best scores; saved cuts on the level currently being played; in-app preferences.
+- No system permissions requested: not photos, contacts, location, microphone, camera, or network.
+- Deleting the app removes all stored data.
+
+The original brief mentioned MetricKit; the live page does not, because the shipping app does not transmit diagnostic data and the disclosure was unnecessary. Don't reintroduce MetricKit copy unless the app actually opts into transmitting.
+
+**Support page (`/support/`) asserts the app has:**
+
+- Drag-to-cut input that snaps to the nearest horizontal or vertical grid line.
+- Tap a cut to remove it.
+- A "back" button at the bottom of the screen for undo.
+- No cross-device sync (local only).
+
+**Curriculum (confirmed 2026-05-06):** 129 levels total. 53 hand-authored (bands A-E) + 72 procedurally-generated and brute-force-validated (band F) + 4 hand-authored anchor levels (tree, fish, mountain, boat). Daily mode and endless mode existed in earlier briefs but were removed from the iOS build before launch; never reintroduce that copy without confirmation.
+
+**Canonical contact email:** `hello@sorkila.com`. Used on privacy, support, press, and as the site-wide convention for any new mailto.
+
 ## SEO / metadata
 
 Every page has `<link rel="canonical">`, full Open Graph (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`, `og:site_name`), Twitter Card meta, and adaptive `theme-color` for light/dark. The home page also ships a JSON-LD `SoftwareApplication` schema (no `offers.price` per the no-hardcoded-pricing rule).
@@ -323,7 +349,7 @@ These were identified in the principal-team audit. None are shipping until Erik 
 - **Apple touch icon as the figure mid-separation.** Current is the 2×2 grid; figure-as-icon would stand out on iOS home screens.
 - **Wordmark optical margin compensation** for Pirata's heavy 'd' descender (sits slightly low optically). Needs visual eyeballing before shipping.
 - **Drag-to-cut release anticipation overshoot.** A tiny over-separation (1–2px) before the rejoin, mirroring `bot-drift`'s settle physics.
-- **Privacy section consolidation** (5 sections → 3). Content rewrite, not styling.
+- **Privacy section consolidation** (7 sections to 3). Content rewrite, not styling.
 - **Custom logotype** drawn for Dela rather than Pirata One. The single most consequential investment in the site's identity. ~3 weeks lead time, ~$3-8k.
 - **Cut-themed page transitions.** Replace the 240ms cross-fade with a horizontal cut: top half slides up, bottom half slides down, new page slides in from the cut. ~30 lines of CSS using `::view-transition-old(root)` / `::view-transition-new(root)` keyframes.
 - **Wordmark cuts itself, synchronized with the figure.** Clip-path on the wordmark animated alongside the figure's keyframe schedule, so wordmark and figure tell the same metaphor at the same moment.
