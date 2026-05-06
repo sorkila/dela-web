@@ -39,16 +39,31 @@
 }
 </script>
 <style>
-  /* spotlight glow — biased toward the wordmark on the now-centered hero */
+  /* Spotlight glow. Position is driven by --spot-x / --spot-y, which JS lerps
+     toward the cursor on pointer-fine devices for a damped "ambient follows you"
+     feel. Static fallback for touch + reduced-motion. */
+  body { --spot-x: 50%; --spot-y: 32%; }
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(1100px 660px at 50% 32%, rgba(var(--paper-rgb), 0.045) 0%, transparent 60%),
-      radial-gradient(700px 400px at 50% 32%, rgba(var(--paper-rgb), 0.025) 0%, transparent 70%);
+      radial-gradient(1100px 660px at var(--spot-x) var(--spot-y), rgba(var(--paper-rgb), 0.05) 0%, transparent 60%),
+      radial-gradient(700px 400px at var(--spot-x) var(--spot-y), rgba(var(--paper-rgb), 0.028) 0%, transparent 70%);
     z-index: 0;
+  }
+  /* Film grain — sub-perceptual fractal noise overlay, breaks the digital flatness.
+     Tightly clamped opacity so it reads as paper texture, not as visible noise. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.025;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
 
   /* staggered entrance */
@@ -69,6 +84,17 @@
     letter-spacing: 0.005em;
     margin: 0;
     color: var(--paper);
+    text-rendering: geometricPrecision;
+  }
+  /* Wordmark gets its own entrance — letterspacing settles from slightly open
+     to the resting tracking, so the letterforms read as "finding their place"
+     rather than just fading in. Overrides the generic .reveal animation. */
+  .wordmark.reveal {
+    animation: wordmark-settle 1.4s var(--ease) 0.05s both;
+  }
+  @keyframes wordmark-settle {
+    from { opacity: 0; transform: translateY(8px); letter-spacing: 0.022em; }
+    to   { opacity: 1; transform: none;            letter-spacing: 0.005em; }
   }
   .tagline {
     font-style: italic;
@@ -121,7 +147,14 @@
       bot-shadow 11s -2.75s infinite,
       bot-flip 11s -2.75s infinite;
   }
-  .hg-top, .hg-bot { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+  /* Layered shadow stack: a tight contact shadow + a wide ambient cast.
+     Real paper hovering above paper is two shadows, not one. Single drop-shadow
+     reads as "drawing program"; the stack reads as physical. */
+  .hg-top, .hg-bot {
+    filter:
+      drop-shadow(0 1px 1.5px rgba(0,0,0,0.20))
+      drop-shadow(0 2px 5px rgba(0,0,0,0.10));
+  }
   .hg-cut {
     color: var(--paper);
     stroke-dasharray: 200;
@@ -149,15 +182,42 @@
     82%  { transform: translate(0, 0);   animation-timing-function: linear; }
     100% { transform: translate(0, 0); }
   }
+  /* Lifted: contact shadow tightens + darkens (paper edge meeting bg);
+     ambient grows large + soft (paper rising into the light). The two
+     layers move at different rates, which is what reads as physical. */
   @keyframes top-shadow {
-    0%, 28%   { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
-    45%, 64%  { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.42)); }
-    82%, 100% { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+    0%, 28% {
+      filter:
+        drop-shadow(0 1px 1.5px rgba(0,0,0,0.20))
+        drop-shadow(0 2px 5px rgba(0,0,0,0.10));
+    }
+    45%, 64% {
+      filter:
+        drop-shadow(0 2px 3px rgba(0,0,0,0.34))
+        drop-shadow(0 16px 32px rgba(0,0,0,0.30));
+    }
+    82%, 100% {
+      filter:
+        drop-shadow(0 1px 1.5px rgba(0,0,0,0.20))
+        drop-shadow(0 2px 5px rgba(0,0,0,0.10));
+    }
   }
   @keyframes bot-shadow {
-    0%, 28%   { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
-    45%, 64%  { filter: drop-shadow(0 6px 10px rgba(0,0,0,0.42)); }
-    82%, 100% { filter: drop-shadow(0 1px 2px rgba(0,0,0,0.22)); }
+    0%, 28% {
+      filter:
+        drop-shadow(0 1px 1.5px rgba(0,0,0,0.20))
+        drop-shadow(0 2px 5px rgba(0,0,0,0.10));
+    }
+    45%, 64% {
+      filter:
+        drop-shadow(0 2px 3px rgba(0,0,0,0.34))
+        drop-shadow(0 16px 32px rgba(0,0,0,0.30));
+    }
+    82%, 100% {
+      filter:
+        drop-shadow(0 1px 1.5px rgba(0,0,0,0.20))
+        drop-shadow(0 2px 5px rgba(0,0,0,0.10));
+    }
   }
   @keyframes bot-flip {
     /* same color as top before/after; shifts to mid through the separation phase.
@@ -201,15 +261,17 @@
     border-radius: 12px;
     color: var(--paper);
     background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.025) 0%, transparent 100%);
+    /* Inset top-edge highlight: gives the tile a faint physical bevel,
+       like the upper edge is catching room light. Brightens on hover. */
+    box-shadow: inset 0 1px 0 rgba(var(--paper-rgb), 0.05);
     text-decoration: none;
     min-height: 52px;
     line-height: 1.1;
-  }
-  .app-badge {
     transition:
       border-color 0.5s var(--ease),
       transform 0.5s var(--ease),
-      background 0.5s var(--ease);
+      background 0.5s var(--ease),
+      box-shadow 0.5s var(--ease);
     will-change: transform;
   }
   @media (hover: hover) {
@@ -217,6 +279,9 @@
       border-color: var(--mid);
       transform: translateY(-1px);
       background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.05) 0%, transparent 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(var(--paper-rgb), 0.10),
+        0 4px 14px rgba(0,0,0,0.22);
     }
   }
   .app-badge svg { flex: 0 0 auto; color: var(--paper); }
@@ -251,8 +316,14 @@
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; animation: none; }
+    .wordmark.reveal { animation: none; opacity: 1; transform: none; letter-spacing: 0.005em; }
     .cell { opacity: 1; animation: none; }
-    .hg-top, .hg-bot { animation: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .hg-top, .hg-bot {
+      animation: none;
+      filter:
+        drop-shadow(0 2px 3px rgba(0,0,0,0.30))
+        drop-shadow(0 12px 24px rgba(0,0,0,0.22));
+    }
     .hg-bot { fill: var(--mid); }
     .hg-top { transform: translate(0, -7px); }
     .hg-bot { transform: translate(0, 7px); }
@@ -288,7 +359,7 @@
           <rect class="cell cell--bot" x="78"  y="117" width="36" height="36"/>
           <rect class="cell cell--bot" x="117" y="117" width="36" height="36"/>
         </g>
-        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="currentColor" stroke-width="0.8" stroke-linecap="round" pathLength="200"/>
+        <line class="hg-cut" x1="0" y1="76.5" x2="153" y2="76.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" pathLength="200"/>
       </svg>
     </div>
 
@@ -406,7 +477,7 @@
     let dragRevealed = false;
     try { dragRevealed = sessionStorage.getItem('dela-dragged') === '1'; } catch (_) {}
     if (dragHint && !dragRevealed) {
-      setTimeout(() => { if (!dragRevealed) dragHint.classList.add('show'); }, 6000);
+      setTimeout(() => { if (!dragRevealed) dragHint.classList.add('show'); }, 4000);
     }
     function markDragged() {
       dragRevealed = true;
@@ -433,10 +504,17 @@
       cut.style.opacity = lineProgress * 0.55;
       cut.style.strokeDashoffset = (1 - lineProgress) * 200;
       bot.style.fill = lerpFill(eased);
-      const blur = 2 + eased * 8;
-      const dy = 1 + eased * 5;
-      const opacity = 0.22 + eased * 0.20;
-      const shadow = `drop-shadow(0 ${dy}px ${blur}px rgba(0,0,0,${opacity}))`;
+      /* Layered shadow: contact + ambient, matching the auto-loop keyframes
+         so a manual drag feels physically the same as the cycle's separation. */
+      const cBlur = 1.5 + eased * 1.5;
+      const cDy = 1 + eased * 1;
+      const cAlpha = 0.20 + eased * 0.14;
+      const aBlur = 5 + eased * 27;
+      const aDy = 2 + eased * 14;
+      const aAlpha = 0.10 + eased * 0.20;
+      const shadow =
+        `drop-shadow(0 ${cDy}px ${cBlur}px rgba(0,0,0,${cAlpha}))` +
+        ` drop-shadow(0 ${aDy}px ${aBlur}px rgba(0,0,0,${aAlpha}))`;
       top.style.filter = shadow;
       bot.style.filter = shadow;
     }
@@ -498,6 +576,28 @@
     figure.addEventListener('pointerup', up);
     figure.addEventListener('pointercancel', up);
   }
+})();
+
+/* Cursor-following ambient spotlight. Damped lerp toward pointer position,
+   updating CSS variables on body. Skipped on touch devices and reduced-motion.
+   Loop only runs while motion is in flight; idles cleanly when settled. */
+(() => {
+  if (!window.matchMedia('(pointer: fine) and (prefers-reduced-motion: no-preference)').matches) return;
+  let tx = 50, ty = 32, cx = 50, cy = 32, raf = null;
+  const tick = () => {
+    cx += (tx - cx) * 0.06;
+    cy += (ty - cy) * 0.06;
+    document.body.style.setProperty('--spot-x', cx.toFixed(2) + '%');
+    document.body.style.setProperty('--spot-y', cy.toFixed(2) + '%');
+    raf = (Math.abs(tx - cx) > 0.05 || Math.abs(ty - cy) > 0.05)
+      ? requestAnimationFrame(tick)
+      : null;
+  };
+  document.addEventListener('pointermove', (e) => {
+    tx = (e.clientX / window.innerWidth) * 100;
+    ty = (e.clientY / window.innerHeight) * 100;
+    if (!raf) raf = requestAnimationFrame(tick);
+  }, { passive: true });
 })();
 
 /* console */
