@@ -1,14 +1,24 @@
 /* dela-web shared chrome.
    Page-specific blocks (hero, animations, prose, FAQ, press) stay inline on each page. */
 
-/* Self-hosted fonts — no third-party requests, no Google Fonts dependency.
-   Inter is a variable font; one file serves 400/500/600. */
+/* Self-hosted fonts. No third-party requests, no Google Fonts dependency.
+   Inter is a variable font; one file serves 400/500/600. Italic ships as a
+   separate file so <em>, .tagline, and .colophon get true italics rather
+   than a synthesised slant. */
 @font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400 600;
   font-display: swap;
   src: url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/inter-latin-italic.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
@@ -60,7 +70,11 @@ body {
   color: var(--paper);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  hanging-punctuation: first;
   overflow-x: hidden;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
@@ -112,6 +126,7 @@ body {
   font-size: clamp(32px, 5.5vw, 44px);
   line-height: 1.1;
   letter-spacing: -0.01em;
+  text-wrap: balance;
   margin: 0 0 24px;
   color: var(--paper);
 }
@@ -125,7 +140,7 @@ body {
   margin: 40px 0 16px;
 }
 
-p { margin: 0 0 18px; }
+p { margin: 0 0 18px; text-wrap: pretty; }
 ul { margin: 0 0 18px; padding-left: 22px; }
 li { margin-bottom: 6px; }
 
