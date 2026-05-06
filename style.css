@@ -103,7 +103,23 @@ body {
   padding-bottom: max(clamp(48px, 8vw, 96px), env(safe-area-inset-bottom, 0px) + 32px);
   padding-left: max(24px, env(safe-area-inset-left, 0px));
 }
-.wrap--home { padding-top: max(clamp(64px, 10vw, 120px), env(safe-area-inset-top, 0px) + 56px); }
+.wrap--home {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: max(clamp(48px, 8vw, 88px), env(safe-area-inset-top, 0px) + 32px);
+  padding-bottom: max(clamp(32px, 6vw, 56px), env(safe-area-inset-bottom, 0px) + 24px);
+}
+.wrap--home > .hero { margin: auto 0; }
+.wrap--home > footer {
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+  font-size: 13px;
+  justify-content: center;
+}
+.wrap--home > footer nav { gap: 0 12px; }
+.wrap--home > footer a { padding: 8px 6px; }
 .wrap--narrow { max-width: var(--max-narrow); }
 
 @keyframes pageReveal {
