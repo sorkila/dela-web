@@ -1,6 +1,8 @@
 # dela-web
 
-Marketing site for **Dela**, a minimalist iOS puzzle game. Hosted at https://playdela.com.
+Marketing site for **dela**, a minimalist iOS puzzle game. Hosted at https://playdela.com.
+
+**Brand name is always lowercase.** Write "dela" everywhere, including at the start of sentences and in titles. The exception is the iOS app source directory (`~/Documents/iOS/Dela/`) and any other path/identifier that already exists in capitalised form on a system Erik doesn't control. Apple's own listing carries whatever name App Store Connect resolves it to; the website's job is to render the brand as `dela` in every surface it owns.
 
 The site exists for three jobs, in order: satisfy App Store Connect's mandatory Privacy + Support URLs, serve press / editorial inquiries, and drive App Store downloads.
 
@@ -81,7 +83,7 @@ Don't add a third typeface. Don't reach for Pirata One on subpages beyond the cr
 
 ### Punctuation
 
-**No em-dashes anywhere** (titles, body copy, comments, commit messages, this file; the rule applies everywhere). Replacements: `:` for the home brand:tagline pattern, `·` for subpage `Page · Dela` titles. Body copy uses curly quotes (`"…"`, `'…'`) and apostrophes; the codebase has been audited and any straight quote that lands in visible text is a regression.
+**No em-dashes anywhere** (titles, body copy, comments, commit messages, this file; the rule applies everywhere). Replacements: `:` for the home brand:tagline pattern, `·` for subpage `Page · dela` titles. Body copy uses curly quotes (`"…"`, `'…'`) and apostrophes; the codebase has been audited and any straight quote that lands in visible text is a regression.
 
 ### Easing
 
@@ -118,7 +120,7 @@ The cells use **two stacked `drop-shadow` filters** rather than one: a tight con
 - The drag-to-cut `paint()` function in JS (manual mode)
 - The `prefers-reduced-motion` static held-apart pose
 
-Every place a Dela cell exists, it uses the same shadow formula. Don't replace either layer in isolation.
+Every place a dela cell exists, it uses the same shadow formula. Don't replace either layer in isolation.
 
 ### Wordmark entrance
 
@@ -206,10 +208,10 @@ Links to `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158` (reg
 
 ### Pricing position
 
-- Dela is **$2.99 USD** (Apple price tier 3), single premium upfront purchase.
+- dela is **$2.99 USD** (Apple price tier 3), single premium upfront purchase.
 - The website **never shows the price**; Apple's badge handles that live per region.
 - Never add a "buy now" CTA. The App Store badge is the only purchase path.
-- Never add "limited time", "sale", "money-back guarantee", or "we'll let you know when Dela goes on sale" newsletter copy.
+- Never add "limited time", "sale", "money-back guarantee", or "we'll let you know when dela goes on sale" newsletter copy.
 
 ### The five-clause line
 
@@ -261,7 +263,7 @@ The original brief mentioned MetricKit; the live page does not, because the ship
 
 Every page has `<link rel="canonical">`, full Open Graph (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`, `og:site_name`), Twitter Card meta, and adaptive `theme-color` for light/dark. The home page also ships a JSON-LD `SoftwareApplication` schema (no `offers.price` per the no-hardcoded-pricing rule).
 
-Title separators follow the no-em-dash rule: home uses `:` for the brand:tagline pattern (`Dela: the art of dividing`); subpages use `·` (`Privacy · Dela`, `Support · Dela`, `Press · Dela`, `Not found · Dela`).
+Title separators follow the no-em-dash rule: home uses `:` for the brand:tagline pattern (`dela: the art of dividing`); subpages use `·` (`Privacy · dela`, `Support · dela`, `Press · dela`, `Not found · dela`).
 
 `apple-itunes-app` smart banner meta carries the live App ID (`6766864158`) on the home page, so Safari users get the in-app banner offering to open the App Store listing.
 
@@ -303,7 +305,7 @@ If a directive ever stops working, the same setting can be toggled in the Inleed
 - **Tap targets ≥ 40px.** Footer links are padded for this.
 - **Safe-area insets on `.wrap`.** Notched iPhones in landscape get clipped without `env(safe-area-inset-*)`.
 - **`position: relative; z-index: 1` on main content containers** so they sit above the fixed-position `body::before` spotlight. `.wrap` already has this; standalone pages (404) set it on their `<main>`.
-- **No PWA manifest.** Dela is an iOS app; this site is a marketing surface, not an installable app.
+- **No PWA manifest.** dela is an iOS app; this site is a marketing surface, not an installable app.
 - **No newsletter, no contact form, no live chat.** Email or nothing: `mailto:hello@sorkila.com` with an appropriate `?subject=` per page.
 - **Don't introduce a build step.** Static HTML is the brief. If you need to add JS, keep it inline at the end of the page that needs it.
 
@@ -344,13 +346,13 @@ Still to do:
 
 These were identified in the principal-team audit. None are shipping until Erik says go:
 
-- **OG image rebuild** around the figure mid-separation. Current OG is wordmark + tagline + hairline divider; reads as a font sample, not a Dela image.
+- **OG image rebuild** around the figure mid-separation. Current OG is wordmark + tagline + hairline divider; reads as a font sample, not a dela image.
 - **Favicon swap to the Pirata 'd'.** Current favicon is the 2×2 grid mark; the wordmark's 'd' is more ownable at 16×16.
 - **Apple touch icon as the figure mid-separation.** Current is the 2×2 grid; figure-as-icon would stand out on iOS home screens.
 - **Wordmark optical margin compensation** for Pirata's heavy 'd' descender (sits slightly low optically). Needs visual eyeballing before shipping.
 - **Drag-to-cut release anticipation overshoot.** A tiny over-separation (1–2px) before the rejoin, mirroring `bot-drift`'s settle physics.
 - **Privacy section consolidation** (7 sections to 3). Content rewrite, not styling.
-- **Custom logotype** drawn for Dela rather than Pirata One. The single most consequential investment in the site's identity. ~3 weeks lead time, ~$3-8k.
+- **Custom logotype** drawn for dela rather than Pirata One. The single most consequential investment in the site's identity. ~3 weeks lead time, ~$3-8k.
 - **Cut-themed page transitions.** Replace the 240ms cross-fade with a horizontal cut: top half slides up, bottom half slides down, new page slides in from the cut. ~30 lines of CSS using `::view-transition-old(root)` / `::view-transition-new(root)` keyframes.
 - **Wordmark cuts itself, synchronized with the figure.** Clip-path on the wordmark animated alongside the figure's keyframe schedule, so wordmark and figure tell the same metaphor at the same moment.
 - **Generative shape rotation.** Currently 3 hand-designed polyominoes loop every 33s; visitors notice. Replace with a JS generator producing valid balanced shapes on the fly.
