@@ -14,7 +14,7 @@ The site exists for three jobs, in order: satisfy App Store Connect's mandatory 
 
 - Plain HTML + CSS. No framework, no JS bundler, no build step.
 - One shared stylesheet (`/style.css`) plus inline `<style>` blocks per page for page-specific rules. `style.css` also owns the spotlight + grain + view-transition chrome that reaches every page.
-- ~80 lines of vanilla JS on the home page only (hero animation, shape rotation, drag-to-cut, cursor-follow spotlight, console egg). Subpages have no JS.
+- ~210 lines of vanilla JS on the home page only (hero animation, shape rotation, drag-to-cut, cursor-follow spotlight, console egg). Subpages have no JS.
 - **Self-hosted fonts** in `/fonts/`. No Google Fonts. The only outbound third-party request on the site is the Umami analytics script.
 
 ## Deployment
@@ -161,7 +161,7 @@ Each `.cell` has an opacity reveal driven by a per-cell `--reveal-delay` custom 
 
 Pointer events on the figure pause the auto-loop and let the visitor produce the cut themselves. JS sets `data-mode="manual"`, painting transform / fill / shadow / cut-line based on drag distance (cleared after release). Uses `pointer-capture` and `touch-action: none` so the page doesn't scroll mid-drag.
 
-A small "drag to cut" caption fades in 6 seconds after page load if the visitor hasn't yet dragged. Dismissed forever (per `sessionStorage`) the first time anyone touches the figure.
+A small "drag to cut" caption fades in 4 seconds after page load if the visitor hasn't yet dragged. Dismissed forever (per `sessionStorage`) the first time anyone touches the figure.
 
 Both the auto-loop and the drag interaction are disabled under `prefers-reduced-motion`. The figure still renders in a static held-apart pose with the cut line visible at 0.4 opacity.
 
@@ -201,7 +201,7 @@ Links to `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158` (reg
 
 ### Voice
 
-- Lowercase by default. Only proper nouns capitalised.
+- Lowercase by default. Most proper nouns (Erik Nielsen, Apple, App Store, iOS, Inter, Pirata One) follow normal capitalisation; the brand "dela" is the explicit exception, always lowercase (see the brand-name rule at the top of this file).
 - Short sentences. Period-terminated. No exclamation marks.
 - "We" is fine for the maker (singular, not corporate).
 - **No em-dashes.** Use hyphens, colons, or rephrase. This is a strong personal preference of Erik's; applies everywhere (copy, comments, commit messages, this file).
@@ -309,29 +309,31 @@ If a directive ever stops working, the same setting can be toggled in the Inleed
 - **No newsletter, no contact form, no live chat.** Email or nothing: `mailto:hello@sorkila.com` with an appropriate `?subject=` per page.
 - **Don't introduce a build step.** Static HTML is the brief. If you need to add JS, keep it inline at the end of the page that needs it.
 
-## Pre-launch checklist (App Store Connect)
+## Launch state
 
-The App Store submission's URL fields point at:
+App went live on the App Store on **2026-05-07**.
 
-- Privacy URL: `https://playdela.com/privacy/` ✓
-- Support URL: `https://playdela.com/support/` ✓
-- Marketing URL: `https://playdela.com/` ✓
+- **App ID:** `6766864158`
+- **App Store URL:** `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158` (region-neutral; Apple resolves locale per visitor)
+- **Marketing URL:** `https://playdela.com/`
+- **Privacy URL:** `https://playdela.com/privacy/` (App Store Connect required)
+- **Support URL:** `https://playdela.com/support/` (App Store Connect required)
+- **Apple EULA URL** in the footer matches `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`
 
-All three return 200 and render with JS disabled. HSTS is set, HTTP redirects to HTTPS, custom 404 serves. Apple EULA URL in the footer matches `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`.
+All three required URLs return 200 and render with JS disabled. HSTS set, HTTP redirects to HTTPS, custom 404 serves.
 
-## Launch state (App ID `6766864158`)
+### Done at launch
 
-App went live on the App Store on 2026-05-07. Live URL: `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158`.
-
-Done:
-- App Store badge `href` updated to the live URL (region-neutral).
+- Brand styling flipped to lowercase across the site (titles, meta, og/twitter, JSON-LD, body, aria, mailto subjects).
+- App Store badge `href` updated to the live URL.
 - Badge text flipped from "Coming soon / App Store" to "Download on the / App Store".
 - `<meta name="apple-itunes-app" content="app-id=6766864158">` added to the home for the Safari smart banner.
 - `/coming-soon/` deleted.
 
-Still to do:
-- Replace the custom Apple-glyph icon with Apple's official "Download on the App Store" SVG badge (download from `tools.applemediaservices.com/app-store/`). Apple's marketing guidelines say "do not modify the badge artwork."
-- Submit `/sitemap.xml` to Google Search Console.
+### Still to do
+
+- **Official Apple badge artwork.** Replace the custom Apple-glyph icon in the home `.app-badge` with Apple's official "Download on the App Store" SVG badge (download from `tools.applemediaservices.com/app-store/`). Apple's marketing guidelines say "do not modify the badge artwork."
+- **Sitemap submission.** Submit `/sitemap.xml` to Google Search Console.
 
 ## Outstanding
 
