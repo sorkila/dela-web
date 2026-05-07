@@ -34,7 +34,6 @@ Deploys finish in ~15s. Watch with `gh run list -R sorkila/dela-web` and `gh run
 | `privacy/index.html` | Privacy policy (App Store mandatory) |
 | `support/index.html` | Support / FAQ (App Store mandatory) |
 | `press/index.html` | Press kit + editorial contact |
-| `coming-soon/index.html` | Pre-launch placeholder; App Store badge links here. Carries a static held-apart mini-figure above the wordmark. Delete after launch. |
 | `404.html` | Branded 404 with CSS-only "didn't quite balance" figure (slowly oscillating). |
 | `style.css` | Shared chrome. Palette, body, footer, links, type, focus, reduced motion. Owns the `body::before` spotlight, the `body::after` grain overlay, `@view-transition` cross-page fade, and the `@font-face` rules. |
 | `.htaccess` | Force HTTPS, HSTS, X-CTO, Referrer-Policy, ErrorDocument 404, immutable cache on fonts + static images. |
@@ -90,13 +89,13 @@ Don't add a third typeface. Don't reach for Pirata One on subpages beyond the cr
 
 ## Shared chrome (every page)
 
-The following lives in `style.css` and applies to every surface (home, subpages, 404, coming-soon) so the brand world doesn't disappear when you click into a subpage:
+The following lives in `style.css` and applies to every surface (home, subpages, 404) so the brand world doesn't disappear when you click into a subpage:
 
 - **`body::before`**: fixed-position radial spotlight at `var(--spot-x) var(--spot-y)`, two stacked gradients (1100×660 outer, 700×400 inner) at low alpha against `--paper-rgb`. Defaults to `50% 32%`.
 - **`body::after`**: fixed-position SVG `feTurbulence` grain overlay, `mix-blend-mode: overlay`, opacity `0.025`, `z-index: 100`. Hidden under `prefers-reduced-transparency: reduce`.
 - **`@view-transition: auto`**: every same-origin navigation gets a 240ms cross-fade in supporting browsers (Chromium, Safari). Falls back to a normal navigation in Firefox. Disabled under `prefers-reduced-motion`.
 
-Pages need `position: relative; z-index: 1` on their main content container so it sits above `body::before`. `.wrap` already does this; 404 and coming-soon set it on their `<main>`.
+Pages need `position: relative; z-index: 1` on their main content container so it sits above `body::before`. `.wrap` already does this; 404 sets it on its `<main>`.
 
 ## Hero animation system (home page)
 
@@ -118,7 +117,6 @@ The cells use **two stacked `drop-shadow` filters** rather than one: a tight con
 - `top-shadow` / `bot-shadow` keyframes (auto-loop)
 - The drag-to-cut `paint()` function in JS (manual mode)
 - The `prefers-reduced-motion` static held-apart pose
-- The coming-soon page's mini-figure
 
 Every place a Dela cell exists, it uses the same shadow formula. Don't replace either layer in isolation.
 
@@ -187,19 +185,15 @@ The crumb structure is `<p class="crumb"><a><span class="arr">←</span><span cl
 
 Privacy includes an "About this website" section disclosing Umami. Support uses `<dl>/<dt>/<dd>` for the FAQ (semantically correct). Press has a download button (`.download`) styled at the same craft level as the home App Store badge: inset top-edge highlight, ambient cast on hover, `translateY(-1px)` lift.
 
-### Coming-soon
-
-Static held-apart polyomino (`.mini-figure`) above the wordmark, using the same layered shadow stack as the home cells with `--paper` top half, `--mid` bottom half, and a faint cut line at 0.4 opacity. The figure renders the brand's signature visual moment without the animation budget. Imports `style.css` for chrome (spotlight, grain, palette tokens).
-
-The "Coming soon" label uses an inline-flex layout with hairline `::before` and `::after` rules (matching the subpage h2 treatment).
-
 ### 404
 
 Two paper bars, the right one slightly low and `--mid` coloured, slowly oscillating on a 5s loop (`.unbalanced .r` runs the `tip` keyframe). Reads as "still searching for balance" rather than a static drawing. Imports `style.css`.
 
 ### App Store badge
 
-Currently a `<a href="/coming-soon/">` placeholder using a non-Apple icon. The badge has an inset `0 1px 0` top-edge highlight that brightens on hover, plus an outer cast that appears on hover (`0 4px 14px rgba(0,0,0,0.22)`) and a `translateY(-1px)` lift. **Swap to Apple's official "Download on the App Store" badge and the live App Store URL after launch.** Apple's marketing guidelines say "do not modify the badge artwork."
+Links to `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158` (region-neutral; Apple resolves locale per visitor). Reads "Download on the / App Store" with a custom non-Apple glyph icon. The badge has an inset `0 1px 0` top-edge highlight that brightens on hover, plus an outer cast that appears on hover (`0 4px 14px rgba(0,0,0,0.22)`) and a `translateY(-1px)` lift.
+
+**Outstanding:** swap the custom glyph for Apple's official "Download on the App Store" SVG badge (downloadable from `tools.applemediaservices.com/app-store/`). Apple's marketing guidelines say "do not modify the badge artwork", so the current bespoke version is technically off-spec. Not blocking; visually defensible until the swap.
 
 ## Brand and content rules
 
@@ -267,11 +261,11 @@ The original brief mentioned MetricKit; the live page does not, because the ship
 
 Every page has `<link rel="canonical">`, full Open Graph (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`, `og:site_name`), Twitter Card meta, and adaptive `theme-color` for light/dark. The home page also ships a JSON-LD `SoftwareApplication` schema (no `offers.price` per the no-hardcoded-pricing rule).
 
-Title separators follow the no-em-dash rule: home uses `:` for the brand:tagline pattern (`Dela: the art of dividing`); subpages use `·` (`Privacy · Dela`, `Support · Dela`, `Press · Dela`, `Not found · Dela`, `Coming soon · Dela`).
+Title separators follow the no-em-dash rule: home uses `:` for the brand:tagline pattern (`Dela: the art of dividing`); subpages use `·` (`Privacy · Dela`, `Support · Dela`, `Press · Dela`, `Not found · Dela`).
 
-`apple-itunes-app` smart banner meta is **deliberately omitted** until Erik provides the Apple App ID. A placeholder ID would silently fail. Add this when the App Store listing is live.
+`apple-itunes-app` smart banner meta carries the live App ID (`6766864158`) on the home page, so Safari users get the in-app banner offering to open the App Store listing.
 
-`/sitemap.xml` lists `/`, `/privacy/`, `/support/`, `/press/`. `/coming-soon/` and `/404.html` carry `<meta name="robots" content="noindex">`.
+`/sitemap.xml` lists `/`, `/privacy/`, `/support/`, `/press/`. `/404.html` carries `<meta name="robots" content="noindex">`.
 
 Google Search Console is verified via `googlee3f1ea143e31a388.html` (file lives at the repo root).
 
@@ -284,7 +278,7 @@ Every page includes preload tags for the fonts it actually uses on first paint. 
 <link rel="preload" as="font" type="font/woff2" href="/fonts/pirata-one-latin.woff2" crossorigin>
 ```
 
-Home and coming-soon also preload `inter-latin-italic.woff2` (their tagline is italic on first paint). Subpages skip italic preload because italic isn't load-bearing in their initial frame.
+Home also preloads `inter-latin-italic.woff2` (its tagline is italic on first paint). Subpages skip italic preload because italic isn't load-bearing in their initial frame.
 
 ## Server config (`.htaccess`)
 
@@ -301,14 +295,14 @@ If a directive ever stops working, the same setting can be toggled in the Inleed
 
 ## Conventions
 
-- **Edit `style.css` for shared chrome.** Edit the inline `<style>` block in a page for that page's specifics. Avoid duplicating shared rules. The spotlight, grain, view transitions, palette tokens, font-faces, body type, footer base, link styles, focus, crumb, h1/h2 styles, and reveal stagger all live in `style.css` and are loaded by every page (including 404 and coming-soon).
+- **Edit `style.css` for shared chrome.** Edit the inline `<style>` block in a page for that page's specifics. Avoid duplicating shared rules. The spotlight, grain, view transitions, palette tokens, font-faces, body type, footer base, link styles, focus, crumb, h1/h2 styles, and reveal stagger all live in `style.css` and are loaded by every page (including 404).
 - **One H1 per page.** Home's H1 is the wordmark; subpages use the page title. Visually-hidden `<h2>`s give the home a logical document outline for screen readers.
 - **Animations must respect `prefers-reduced-motion`.** The home page has a substantial reduced-motion block at the end of its `<style>`; mirror that pattern for any new animations. The `.wordmark.reveal` selector has higher specificity than the generic `.reveal` reduced-motion override, so any element-specific reveal animation needs an explicit reduced-motion reset (see the existing `.wordmark.reveal { animation: none; }` rule).
 - **Transparency under `prefers-reduced-transparency`.** The grain overlay (`body::after`) hides under this query. Any future overlay-style chrome should follow.
 - **Hover styles must be gated behind `@media (hover: hover)`.** Otherwise touch devices get sticky hover after tap.
 - **Tap targets ≥ 40px.** Footer links are padded for this.
 - **Safe-area insets on `.wrap`.** Notched iPhones in landscape get clipped without `env(safe-area-inset-*)`.
-- **`position: relative; z-index: 1` on main content containers** so they sit above the fixed-position `body::before` spotlight. `.wrap` already has this; standalone pages (404, coming-soon) set it on their `<main>`.
+- **`position: relative; z-index: 1` on main content containers** so they sit above the fixed-position `body::before` spotlight. `.wrap` already has this; standalone pages (404) set it on their `<main>`.
 - **No PWA manifest.** Dela is an iOS app; this site is a marketing surface, not an installable app.
 - **No newsletter, no contact form, no live chat.** Email or nothing: `mailto:hello@sorkila.com` with an appropriate `?subject=` per page.
 - **Don't introduce a build step.** Static HTML is the brief. If you need to add JS, keep it inline at the end of the page that needs it.
@@ -323,13 +317,19 @@ The App Store submission's URL fields point at:
 
 All three return 200 and render with JS disabled. HSTS is set, HTTP redirects to HTTPS, custom 404 serves. Apple EULA URL in the footer matches `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`.
 
-## Post-launch (do these in order once the App Store listing exists)
+## Launch state (App ID `6766864158`)
 
-1. Wrap the App Store badge `href` with the live App Store URL (`https://apps.apple.com/app/idXXXXXXXXX`).
-2. Replace the placeholder Apple icon with Apple's official "Download on the App Store" SVG badge.
-3. Add `<meta name="apple-itunes-app" content="app-id=XXXXXXXXX">` to the home (and optionally other pages) for the Safari smart banner.
-4. Delete `/coming-soon/`.
-5. Submit `/sitemap.xml` to Google Search Console.
+App went live on the App Store on 2026-05-07. Live URL: `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158`.
+
+Done:
+- App Store badge `href` updated to the live URL (region-neutral).
+- Badge text flipped from "Coming soon / App Store" to "Download on the / App Store".
+- `<meta name="apple-itunes-app" content="app-id=6766864158">` added to the home for the Safari smart banner.
+- `/coming-soon/` deleted.
+
+Still to do:
+- Replace the custom Apple-glyph icon with Apple's official "Download on the App Store" SVG badge (download from `tools.applemediaservices.com/app-store/`). Apple's marketing guidelines say "do not modify the badge artwork."
+- Submit `/sitemap.xml` to Google Search Console.
 
 ## Outstanding
 
