@@ -1,0 +1,32 @@
+# dela — minimalist puzzle game for iPhone and iPad
+
+> dela is a minimalist iOS puzzle game about cutting abstract shapes into two perfectly balanced halves with as few straight lines as possible. 137 hand-tuned levels. Premium upfront: one price, no ads, no in-app purchases, no subscription, no accounts. Built by Erik Nielsen, an independent designer-engineer in Stockholm.
+
+## What is dela?
+
+dela ("divide" in Swedish) is a puzzle game built around a single mechanic: drag to cut a shape into two parts of equal area. The cut snaps to the grid. Fewer cuts is better. The mechanic is simple; the decisions are not.
+
+The brand name is always lowercase: "dela", including at the start of sentences.
+
+## Key facts
+
+- **Levels:** 137 hand-tuned levels
+- **Platform:** iOS (iPhone and iPad). Requires iOS 17.0 or later.
+- **Price:** $2.99 (US), one-time purchase. No ads, no in-app purchases, no subscription, no accounts.
+- **Privacy:** fully offline. No server connection, no analytics or advertising SDKs in the app, no login. Progress is stored on the device only; deleting the app removes all data.
+- **App Store:** https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158
+- **App Store ID:** 6766864158
+- **Developer:** Erik Nielsen (solo indie developer, Stockholm, Sweden)
+- **Website:** https://playdela.com
+
+## Links
+
+- Press kit: https://playdela.com/press/
+- Support and FAQ: https://playdela.com/support/
+- Privacy policy: https://playdela.com/privacy/
+
+## Contact
+
+- Email: hello@sorkila.com
+- Website: https://playdela.com
+- Developer site: https://sorkila.com

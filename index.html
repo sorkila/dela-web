@@ -33,12 +33,16 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
+  "@type": ["SoftwareApplication", "VideoGame"],
   "name": "dela",
   "applicationCategory": "GameApplication",
-  "operatingSystem": "iOS 17",
+  "operatingSystem": "iOS 17.0 or later",
   "description": "A minimalist iOS puzzle game about cutting abstract shapes into two perfectly balanced halves with as few straight lines as possible.",
   "url": "https://playdela.com/",
+  "image": "https://playdela.com/og.png",
+  "installUrl": "https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158",
+  "sameAs": "https://sorkila.com",
+  "offers": { "@type": "Offer", "price": "2.99", "priceCurrency": "USD" },
   "author": { "@type": "Person", "name": "Erik Nielsen", "url": "https://sorkila.com" }
 }
 </script>
@@ -319,6 +323,7 @@
   <header class="hero">
     <h1 class="wordmark reveal r1">dela</h1>
     <p class="tagline reveal r2">the art of dividing.</p>
+    <p class="fineprint reveal r2">A minimalist puzzle game for iPhone and iPad. Cut shapes into two perfectly balanced halves.</p>
 
     <!-- Hero visual: 12-cell hourglass polyomino. Drag the figure vertically to cut it.
          Swap for hero.mp4 / hero.gif when delivered. -->

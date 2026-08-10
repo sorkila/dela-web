@@ -255,13 +255,13 @@ The original brief mentioned MetricKit; the live page does not, because the ship
 - A "back" button at the bottom of the screen for undo.
 - No cross-device sync (local only).
 
-**Curriculum (confirmed 2026-05-06):** 129 levels total. 53 hand-authored (bands A-E) + 72 procedurally-generated and brute-force-validated (band F) + 4 hand-authored anchor levels (tree, fish, mountain, boat). Daily mode and endless mode existed in earlier briefs but were removed from the iOS build before launch; never reintroduce that copy without confirmation.
+**Curriculum (confirmed 2026-08-10, app v1.04):** 137 levels total. 53 hand-authored (bands A-E) + 72 procedurally-generated and brute-force-validated (band F) + 8 hand-authored band G levels (added in v1.01) + 4 hand-authored anchor levels (tree, fish, mountain, boat). Daily mode and endless mode existed in earlier briefs but were removed from the iOS build before launch; never reintroduce that copy without confirmation.
 
 **Canonical contact email:** `hello@sorkila.com`. Used on privacy, support, press, and as the site-wide convention for any new mailto.
 
 ## SEO / metadata
 
-Every page has `<link rel="canonical">`, full Open Graph (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`, `og:site_name`), Twitter Card meta, and adaptive `theme-color` for light/dark. The home page also ships a JSON-LD `SoftwareApplication` schema (no `offers.price` per the no-hardcoded-pricing rule).
+Every page has `<link rel="canonical">`, full Open Graph (`og:type`, `og:title`, `og:description`, `og:url`, `og:image`, `og:site_name`), Twitter Card meta, and adaptive `theme-color` for light/dark. The home page also ships a JSON-LD `["SoftwareApplication","VideoGame"]` schema with an `offers` node ($2.99 USD, added 2026-08-10 for search and AI-assistant visibility). This is a deliberate, Erik-approved exception to the no-hardcoded-pricing rule: structured data is machine-readable metadata, not visible UI, and the page itself still never shows the price. If the App Store tier changes (or the Apple Arcade fallback fires), update the `offers` node in `index.html` by hand.
 
 Title separators follow the no-em-dash rule: home uses `:` for the brand:tagline pattern (`dela: the art of dividing`); subpages use `·` (`Privacy · dela`, `Support · dela`, `Press · dela`, `Not found · dela`).
 
@@ -342,7 +342,7 @@ All three required URLs return 200 and render with JS disabled. HSTS set, HTTP r
 - **Domain choice.** Original brief recommended `dela.app`. Currently parked on a different IP. If Erik migrates, swap all canonicals + og URLs back to `https://dela.app/`.
 - **Screenshots.** Press copy publishes "six in-game screenshots at iPhone 6.7\" resolution"; Erik will deliver these. They're currently absent from the home page (hero is figure-only) and absent from `/press-kit.zip`.
 - **Press kit zip.** `/press` links to `/press-kit.zip` which is currently a 404. Build the zip when assets are ready.
-- **Level count.** Shipping curriculum is **129 levels**: 53 hand-authored (bands A-E), 72 procedurally-generated and brute-force-validated (band F), 4 hand-authored anchor levels (tree, fish, mountain, boat). Press copy can say "129 hand-tuned levels" (tighter) or "129 levels: 57 hand-authored, 72 brute-force-validated procedurally generated." Currently nothing on the live site cites a count; copy was stripped when the home went one-screen.
+- **Level count.** Shipping curriculum is **137 levels** as of app v1.01+: 53 hand-authored (bands A-E), 72 procedurally-generated and brute-force-validated (band F), 8 hand-authored band G, 4 hand-authored anchor levels (tree, fish, mountain, boat). Press copy says "137 hand-tuned levels" (updated 2026-08-10 on /press/ and in llms.txt; keep both in sync with the app repo's CLAUDE.md when the curriculum changes).
 
 ### Deferred design work (audit conclusions, not yet shipped)
 
