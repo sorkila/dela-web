@@ -113,14 +113,31 @@ body::after {
   body::after { display: none; }
 }
 
-/* Cross-page navigation fade. Browsers that don't support View Transitions
-   fall back to a normal navigation; everywhere else gets a 240ms cross-fade
-   that makes the site feel like one document instead of five. */
+/* Cut-themed navigation. The new page opens along a horizontal cut at the
+   centre of the viewport: its two reveal edges travel up and down the way the
+   figure's halves separate, while the old page dims slightly beneath. A true
+   two-half slide of the old snapshot isn't possible (the API exposes a single
+   snapshot pseudo per name, and one element can't translate in two directions),
+   so the cut belongs to the incoming page. mix-blend-mode resets to normal
+   because the UA's plus-lighter cross-fade blend would brighten the dark bg
+   where the opaque snapshots overlap. Firefox ignores @view-transition and
+   gets a normal navigation; reduced motion skips the animation entirely. */
 @view-transition { navigation: auto; }
 ::view-transition-old(root),
+::view-transition-new(root) { mix-blend-mode: normal; }
+::view-transition-old(root) {
+  animation: vt-recede 0.36s var(--ease) both;
+}
 ::view-transition-new(root) {
-  animation-duration: 0.24s;
-  animation-timing-function: var(--ease);
+  animation: vt-cut-open 0.36s var(--ease) both;
+}
+@keyframes vt-recede {
+  from { opacity: 1; }
+  to   { opacity: 0.7; }
+}
+@keyframes vt-cut-open {
+  from { clip-path: inset(50% 0 50% 0); }
+  to   { clip-path: inset(0 0 0 0); }
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
@@ -183,7 +200,7 @@ body::after {
 .wrap--narrow > *:nth-child(8)   { animation-delay: 0.42s; }
 .wrap--narrow > *:nth-child(n+9) { animation-delay: 0.44s; }
 
-/* Crumb — the only navigation chrome on subpages, also the only place that
+/* Crumb: the only navigation chrome on subpages, also the only place that
    carries the wordmark identity to the rest of the site. The "dela" set in
    Pirata at a small size reads as a tiny logo mark. Arrow translates left
    on hover so the visitor feels the back-link before they click. */

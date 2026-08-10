@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <style>
-    .top { fill: #E8E6E1; }
-    .bot { fill: #9A9590; }
+    .d { fill: #E8E6E1; }
     @media (prefers-color-scheme: light) {
-      .top { fill: #1A1A1A; }
-      .bot { fill: #6B6655; }
+      .d { fill: #1A1A1A; }
     }
   </style>
-  <rect class="top" x="1"  y="1"  width="14" height="14" rx="2"/>
-  <rect class="top" x="17" y="1"  width="14" height="14" rx="2"/>
-  <rect class="bot" x="1"  y="17" width="14" height="14" rx="2"/>
-  <rect class="bot" x="17" y="17" width="14" height="14" rx="2"/>
+  <!-- Pirata One lowercase 'd', outlined from /fonts/pirata-one-latin.woff2.
+       Nudged 0.75px above geometric centre: the bowl is bottom-heavy and the
+       glyph reads low when centred by bounding box. -->
+  <g class="d" transform="translate(7.2909, 29.25) scale(0.036364, -0.036364)">
+    <path d="M238 770Q265 770 323.0 639.0Q381 508 381 458V153Q381 130 393.5 108.0Q406 86 429 83V61Q422 60 320 0Q297 10 278.5 29.5Q260 49 260 66Q153 0 135 0Q128 0 108.5 15.5Q89 31 69.5 60.5Q50 90 50 121V478Q50 488 219 547Q183 626 161.0 658.0Q139 690 118 690H85V720Q196 770 238 770ZM221 92Q240 92 260 108V456Q260 462 251.5 481.5Q243 501 239 501Q210 501 180 483L170 477V166Q170 92 221 92Z"/>
+  </g>
 </svg>

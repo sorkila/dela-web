@@ -37,11 +37,11 @@ Deploys finish in ~15s. Watch with `gh run list -R sorkila/dela-web` and `gh run
 | `support/index.html` | Support / FAQ (App Store mandatory) |
 | `press/index.html` | Press kit + editorial contact |
 | `404.html` | Branded 404 with CSS-only "didn't quite balance" figure (slowly oscillating). |
-| `style.css` | Shared chrome. Palette, body, footer, links, type, focus, reduced motion. Owns the `body::before` spotlight, the `body::after` grain overlay, `@view-transition` cross-page fade, and the `@font-face` rules. |
+| `style.css` | Shared chrome. Palette, body, footer, links, type, focus, reduced motion. Owns the `body::before` spotlight, the `body::after` grain overlay, the `@view-transition` cut-open navigation, and the `@font-face` rules. |
 | `.htaccess` | Force HTTPS, HSTS, X-CTO, Referrer-Policy, ErrorDocument 404, immutable cache on fonts + static images. |
 | `sitemap.xml`, `robots.txt` | Allow indexing on `/`, `/privacy/`, `/support/`, `/press/` |
-| `og.png` | 1200×630 OG image; Pirata One wordmark + italic tagline + hairline divider. **Deferred upgrade**: rebuild around the figure mid-separation. |
-| `favicon.svg` + raster siblings | Adaptive 2×2 grid mark, light/dark via SVG `<style>` |
+| `og.png` | 1200×630 OG image; the hourglass figure in its held-apart pose (drifted halves, mid-coloured bottom, cut line, layered shadow stack) beside the Pirata wordmark + italic tagline on the dark canonical bg. The old wordmark-only version is kept unreferenced as `og-wordmark-legacy.png`. |
+| `favicon.svg` + raster siblings | Adaptive Pirata One 'd' (outlined glyph path, no font dependency), light/dark via SVG `<style>`. Glyph sits 0.75px above geometric centre; the bottom-heavy bowl reads low when bbox-centred. |
 | `apple-touch-icon.png` | iOS home screen icon (full app-icon styling) |
 | `fonts/inter-latin.woff2` | Variable Inter upright, 400-600 weight range, latin subset (~48KB) |
 | `fonts/inter-latin-italic.woff2` | Variable Inter italic, 400-600 weight range, latin subset (~52KB). Loads as a separate `@font-face` so the tagline and `<em>` get real italic glyphs, not a synthesised slant. |
@@ -95,7 +95,7 @@ The following lives in `style.css` and applies to every surface (home, subpages,
 
 - **`body::before`**: fixed-position radial spotlight at `var(--spot-x) var(--spot-y)`, two stacked gradients (1100×660 outer, 700×400 inner) at low alpha against `--paper-rgb`. Defaults to `50% 32%`.
 - **`body::after`**: fixed-position SVG `feTurbulence` grain overlay, `mix-blend-mode: overlay`, opacity `0.025`, `z-index: 100`. Hidden under `prefers-reduced-transparency: reduce`.
-- **`@view-transition: auto`**: every same-origin navigation gets a 240ms cross-fade in supporting browsers (Chromium, Safari). Falls back to a normal navigation in Firefox. Disabled under `prefers-reduced-motion`.
+- **`@view-transition: auto`**: every same-origin navigation gets the cut-open transition in supporting browsers (Chromium, Safari): the new page's snapshot opens along a horizontal clip-path cut at the viewport centre (360ms, `--ease`) while the old page dims slightly beneath. The two reveal edges travel apart the way the figure's halves do. A true two-half slide of the old snapshot isn't possible with the API (one snapshot pseudo per name), so the cut belongs to the incoming page; `mix-blend-mode: normal` on both pseudos prevents the UA's plus-lighter blend from brightening the dark bg. Falls back to a normal navigation in Firefox. Disabled under `prefers-reduced-motion`.
 
 Pages need `position: relative; z-index: 1` on their main content container so it sits above `body::before`. `.wrap` already does this; 404 sets it on its `<main>`.
 
@@ -346,16 +346,15 @@ All three required URLs return 200 and render with JS disabled. HSTS set, HTTP r
 
 ### Deferred design work (audit conclusions, not yet shipped)
 
-These were identified in the principal-team audit. None are shipping until Erik says go:
+These were identified in the principal-team audit. None are shipping until Erik says go.
 
-- **OG image rebuild** around the figure mid-separation. Current OG is wordmark + tagline + hairline divider; reads as a font sample, not a dela image.
-- **Favicon swap to the Pirata 'd'.** Current favicon is the 2×2 grid mark; the wordmark's 'd' is more ownable at 16×16.
+Shipped 2026-08-10: OG image rebuild around the figure mid-separation, favicon swap to the Pirata 'd', and cut-themed page transitions (see the file map and shared chrome sections for what shipped).
+
 - **Apple touch icon as the figure mid-separation.** Current is the 2×2 grid; figure-as-icon would stand out on iOS home screens.
 - **Wordmark optical margin compensation** for Pirata's heavy 'd' descender (sits slightly low optically). Needs visual eyeballing before shipping.
 - **Drag-to-cut release anticipation overshoot.** A tiny over-separation (1–2px) before the rejoin, mirroring `bot-drift`'s settle physics.
 - **Privacy section consolidation** (7 sections to 3). Content rewrite, not styling.
 - **Custom logotype** drawn for dela rather than Pirata One. The single most consequential investment in the site's identity. ~3 weeks lead time, ~$3-8k.
-- **Cut-themed page transitions.** Replace the 240ms cross-fade with a horizontal cut: top half slides up, bottom half slides down, new page slides in from the cut. ~30 lines of CSS using `::view-transition-old(root)` / `::view-transition-new(root)` keyframes.
 - **Wordmark cuts itself, synchronized with the figure.** Clip-path on the wordmark animated alongside the figure's keyframe schedule, so wordmark and figure tell the same metaphor at the same moment.
 - **Generative shape rotation.** Currently 3 hand-designed polyominoes loop every 33s; visitors notice. Replace with a JS generator producing valid balanced shapes on the fly.
 - **Sound design.** Subtle paper-tear whisper on cut moments + ambient room tone. Defaulted off, opt-in via small `♪` toggle.
