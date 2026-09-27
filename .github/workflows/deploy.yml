@@ -21,3 +21,9 @@ jobs:
           server-dir: /public_html/
           protocol: ftp
           port: 21
+          # tools/ holds the brand and screenshot scripts; they are not part of the site.
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            tools/**

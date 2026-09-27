@@ -1,4 +1,4 @@
-/* dela-web shared chrome.
+/* Dela website, shared chrome.
    Page-specific blocks (hero, animations, prose, FAQ, press) stay inline on each page. */
 
 /* Self-hosted fonts. No third-party requests, no Google Fonts dependency.
@@ -30,14 +30,24 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Ink and gold: the palette of the app's lacquer table (Theme.swift, v2.0).
+   Dark only, like the app. --bg is the table, --paper the bone text,
+   --gold the molten line (Theme.gold #e8cf8b), --gold-deep its shadowed
+   side (Theme.goldDeep), --ivory the resting half. */
 :root {
+  color-scheme: dark;
   --bg: #131110;
   --paper: #E8E6E1;
   --paper-rgb: 232, 230, 225;
-  --mid: #A8A39E;          /* bumped from #9A9590 to clear AAA on --bg */
-  --muted: #8B857C;
+  --mid: #A8A39E;          /* AAA on --bg */
+  --muted: #8B857C;        /* AA on --bg */
   --surface: #322F2C;
   --surface-2: #221F1D;
+  --gold: #E8CF8B;
+  --gold-rgb: 232, 207, 139;
+  --gold-deep: #C9A95C;
+  --ivory: #EDE6D6;
+  --light-rgb: 255, 222, 170;  /* the warm lamp over the table */
   --measure: 520px;
   --max: 760px;
   --max-narrow: 640px;
@@ -46,22 +56,6 @@
      subpages keep the static defaults. */
   --spot-x: 50%;
   --spot-y: 32%;
-}
-
-/* Optional light variant. Dark is canonical (per brief).
-   Tones are tuned for WCAG AA on the light bg, not just mirrored from the brief's
-   recommendation - the literal "secondary #7A756D" only reaches 4.18:1 on #F5F4F0,
-   which fails AA for normal text. These pass. */
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #F5F4F0;
-    --paper: #1A1A1A;
-    --paper-rgb: 26, 26, 26;
-    --mid: #5C574A;        /* darkened from #6B6655 to clear AAA on --bg */
-    --muted: #7C7766;
-    --surface: #E0DDD4;
-    --surface-2: #ECEAE2;
-  }
 }
 
 *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -83,9 +77,9 @@ body {
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
-::selection { background: rgba(var(--paper-rgb), 0.18); color: var(--paper); }
+::selection { background: rgba(var(--gold-rgb), 0.28); color: var(--paper); }
 
-/* Shared lighting. Spotlight glow + sub-perceptual paper-grain overlay reach
+/* Shared lighting. A warm lamp glow + sub-perceptual grain overlay reach
    every page, so the brand world doesn't disappear when you click into a
    subpage. The home's JS lerps --spot-x/--spot-y toward the cursor; subpages
    keep the static defaults. */
@@ -96,8 +90,8 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(1100px 660px at var(--spot-x) var(--spot-y), rgba(var(--paper-rgb), 0.05) 0%, transparent 60%),
-    radial-gradient(700px 400px at var(--spot-x) var(--spot-y), rgba(var(--paper-rgb), 0.028) 0%, transparent 70%);
+    radial-gradient(1100px 660px at var(--spot-x) var(--spot-y), rgba(var(--light-rgb), 0.055) 0%, transparent 60%),
+    radial-gradient(700px 400px at var(--spot-x) var(--spot-y), rgba(var(--light-rgb), 0.03) 0%, transparent 70%);
 }
 body::after {
   content: '';
@@ -201,8 +195,8 @@ body::after {
 .wrap--narrow > *:nth-child(n+9) { animation-delay: 0.44s; }
 
 /* Crumb: the only navigation chrome on subpages, also the only place that
-   carries the wordmark identity to the rest of the site. The "dela" set in
-   Pirata at a small size reads as a tiny logo mark. Arrow translates left
+   carries the wordmark identity to the rest of the site. The gold "Dela" set
+   in Pirata at a small size reads as a tiny logo mark. Arrow translates left
    on hover so the visitor feels the back-link before they click. */
 .crumb {
   font-size: 14px;
@@ -223,6 +217,7 @@ body::after {
 }
 .crumb .mark {
   font-family: 'Pirata One', serif;
+  color: var(--gold);
   font-size: 20px;
   line-height: 1;
   letter-spacing: 0.005em;
@@ -278,8 +273,8 @@ a {
   text-decoration-color: var(--surface);
   transition: text-decoration-color 0.4s var(--ease), color 0.4s var(--ease);
 }
-@media (hover: hover) { a:hover { text-decoration-color: var(--mid); } }
-a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; border-radius: 2px; }
+@media (hover: hover) { a:hover { text-decoration-color: var(--gold-deep); } }
+a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
 
 footer {
   margin-top: clamp(80px, 12vw, 140px);
