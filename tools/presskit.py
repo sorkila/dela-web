@@ -33,7 +33,7 @@ Developer     Erik Nielsen, Stockholm
 Platforms     iPhone and iPad, iOS 17 or later
 Price         Free to try. Chapters I and II are free; one in-app purchase
               unlocks everything else, once. Earlier buyers keep everything.
-Dela 2.0      17 November 2026
+Dela 2.0      September 2026
 First release 7 May 2026
 Contact       hello@sorkila.com
 Website       https://playdela.com

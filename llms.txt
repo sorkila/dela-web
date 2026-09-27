@@ -10,7 +10,7 @@ The name is written "Dela", with a capital D.
 
 ## Key facts
 
-- **Version:** Dela 2.0, released 17 November 2026 as an update to the original app (first released 7 May 2026).
+- **Version:** Dela 2.0, released September 2026 as an update to the original app (first released 7 May 2026).
 - **Chapters:** seven chapters, 85 boards. I Halves (12 boards) and II Twins (13 boards) are free; III Seeds, IV Apart, V Two of everything, VI Thirds and VII The exception (12 boards each) come with the unlock.
 - **Also inside:** "Legacy levels", the first Dela: 137 boards, cut in lanes, fewest cuts wins.
 - **Platform:** iPhone and iPad. Requires iOS 17.0 or later.
