@@ -11,10 +11,10 @@ The name is written "Dela", with a capital D.
 ## Key facts
 
 - **Version:** Dela 2.0, released 17 November 2026 as an update to the original app (first released 7 May 2026).
-- **Chapters:** I Halves (12 boards) and II Twins (13 boards), free; III Seeds (12 boards), with the unlock. Chapters IV to VII (Apart, Two of everything, Thirds, The exception) arrive in December updates.
-- **Also inside:** "The original Dela", the first game: 137 boards, cut in lanes, fewest cuts wins.
+- **Chapters:** seven chapters, 85 boards. I Halves (12 boards) and II Twins (13 boards) are free; III Seeds, IV Apart, V Two of everything, VI Thirds and VII The exception (12 boards each) come with the unlock.
+- **Also inside:** "Legacy levels", the first Dela: 137 boards, cut in lanes, fewest cuts wins.
 - **Platform:** iPhone and iPad. Requires iOS 17.0 or later.
-- **Price:** free to download. Chapters I and II are free. One non-consumable in-app purchase unlocks chapter III, the later chapters and the original Dela; an optional supporter tier unlocks the same. No subscription. People who bought Dela before keep everything at no cost.
+- **Price:** free to download. Chapters I and II are free. One non-consumable in-app purchase unlocks chapters III to VII and the legacy levels; an optional supporter tier unlocks the same. No subscription. People who bought Dela before keep everything at no cost.
 - **Privacy:** the app collects no data (App Store label "Data Not Collected"). No accounts, no ads, no analytics or advertising SDKs. Purchases go through Apple. Progress is stored on the device only.
 - **App Store:** https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158
 - **App Store ID:** 6766864158
