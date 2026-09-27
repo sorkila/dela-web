@@ -185,7 +185,7 @@ App Store reviewers read these pages, so the claims must match the build. If the
 
 **Support (`/support/`):** one continuous line along the grid from edge to edge, bends allowed, lift to cut; chapter I equal area, chapter II same shape turned or mirrored; a wrong line shows why and slides back; hints appear as a mark at the bottom after you've been stuck, each nudge shows more, set to Off / Patient / Eager in home (grid icon) under Feel; The original Dela is in home under Classic (drag to cut, tap a cut to remove, Back to undo); restore from the unlock screen ("Restore purchase"); no sync; refunds via reportaproblem.apple.com.
 
-**Content (confirmed 2026-09-27, app 2.0 build 13):** chapter I Halves 12 boards, chapter II Twins 14 boards, chapters III-VII (Seeds, Apart, Two of everything, Thirds, The exception) "in December", The original Dela 137 boards. iOS 17 or later, iPhone and iPad.
+**Content (confirmed 2026-09-27, app 2.0 build 13):** chapter I Halves 12 boards, chapter II Twins 13 boards, chapters III-VII (Seeds, Apart, Two of everything, Thirds, The exception) "in December", The original Dela 137 boards. iOS 17 or later, iPhone and iPad.
 
 **Canonical contact email:** `hello@sorkila.com`, with `?subject=Dela%20support` / `Dela%20privacy` / `Dela%20press`.
 
