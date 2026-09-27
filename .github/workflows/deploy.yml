@@ -21,9 +21,13 @@ jobs:
           server-dir: /public_html/
           protocol: ftp
           port: 21
-          # tools/ holds the brand and screenshot scripts; they are not part of the site.
+          # Setting exclude replaces the action's defaults, so the first three repeat them.
+          # The rest are dev-only: notes (CLAUDE.md) and the asset scripts in tools/.
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/.DS_Store
+            **/*.md
+            **/*.py
             tools/**
