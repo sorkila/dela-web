@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 # App Store order, from store_assets/v2/framed_iphone.
-SHOTS = ["landing", "stroke", "miss", "halves", "hint", "home"]
+SHOTS = ["landing", "stroke", "miss", "halves", "seeds", "hint", "home"]
 
 # pngquant quality per group: the raw captures carry the detail an editor
 # might crop into; the framed ones are finished marketing images.
@@ -43,9 +43,10 @@ edge, bending where you like, and lift your finger to cut it in two. In
 chapter I, Halves (12 boards), the parts must hold the same area. In chapter
 II, Twins (13 boards), they must match, turned or mirrored: the gold half
 lifts, turns and lands on its ivory twin, or tries anyway and shows you which
-cells don't fit. Five more chapters arrive in December: Seeds, Apart, Two of
-everything, Thirds and The exception. The original Dela, the 137-board
-lane-cutting game where it started, is inside too. Hints wait until you've had
+cells don't fit. In chapter III, Seeds (12 boards), gold beads sit in the
+cells and each half must hold the same number. Four more chapters arrive in
+December: Apart, Two of everything, Thirds and The exception. The original
+Dela, the 137-board lane-cutting game where it started, is inside too. Hints wait until you've had
 a real go. No ads, no tracking, no login.
 
 Contents
