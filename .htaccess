@@ -21,6 +21,16 @@
   Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
+# --- Dev notes stay private ---
+# The deploy never uploads *.md, but an old CLAUDE.md from before that exclusion is still on
+# the server (the FTP action doesn't delete excluded files). Answer 404 for any .md.
+<IfModule mod_rewrite.c>
+  RewriteRule \.md$ - [R=404,L]
+</IfModule>
+<FilesMatch "\.md$">
+  Require all denied
+</FilesMatch>
+
 # --- Branded 404 ---
 ErrorDocument 404 /404.html
 
