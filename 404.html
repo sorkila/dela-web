@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Not found · dela</title>
+<title>Not found · Dela</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#131110" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)">
-<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#131110">
+<meta name="color-scheme" content="dark">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -35,9 +34,8 @@
   }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-  /* "Didn't quite balance" — two paper bars, the right one slightly low and
-     slowly oscillating. Reads as "still searching for balance" rather than
-     a static drawing. */
+  /* "Didn't quite fit": an ivory half and a gold half that are not twins.
+     The gold one sits a little low and slowly rocks, still trying to land. */
   .unbalanced {
     width: 96px;
     height: 36px;
@@ -49,12 +47,12 @@
   .unbalanced span {
     display: block;
     border-radius: 4px;
-    background: var(--paper);
+    box-shadow: 0 1px 1.5px rgba(0,0,0,0.45), 0 4px 10px rgba(0,0,0,0.35);
   }
-  .unbalanced .l { flex: 1; }
+  .unbalanced .l { flex: 1; background: linear-gradient(180deg, #EDE6D6, #BDB09C); }
   .unbalanced .r {
     flex: 0.55;
-    background: var(--mid);
+    background: linear-gradient(135deg, #FAE094 0%, #DBA847 30%, #8C5E1C 58%, #CC993D 80%, #F2D17A 100%);
     transform: translateY(6px);
     animation: tip 5s ease-in-out 1.2s infinite;
   }
@@ -69,7 +67,7 @@
     font-size: clamp(56px, 12vw, 96px);
     line-height: 1;
     margin: 0;
-    color: var(--paper);
+    color: var(--gold);
   }
   p { color: var(--muted); margin: 14px 0 0; font-size: 16px; }
 
@@ -83,8 +81,8 @@
 <main>
   <div class="unbalanced" aria-hidden="true"><span class="l"></span><span class="r"></span></div>
   <h1>404</h1>
-  <p>nothing to divide here.</p>
-  <p><a href="/">return home</a></p>
+  <p>Nothing to divide here.</p>
+  <p><a href="/">Return home</a></p>
 </main>
 </body>
 </html>
