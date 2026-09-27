@@ -26,7 +26,7 @@ The site exists for three jobs, in order: satisfy App Store Connect's mandatory 
 
 ## Deployment
 
-`.github/workflows/deploy.yml` runs `SamKirkland/FTP-Deploy-Action` on every push to `main`, deploying to `/public_html/` over plain FTP on port 21. `tools/**` is excluded (the `exclude` list repeats the action's defaults because setting it replaces them).
+`.github/workflows/deploy.yml` runs `SamKirkland/FTP-Deploy-Action` on every push to `main`, deploying to `/public_html/` over plain FTP on port 21. Excluded: `**/*.md` (this file), `**/*.py`, `tools/**` and `**/.DS_Store`; the `exclude` list repeats the action's defaults (`**/.git*`, `**/.git*/**`, `**/node_modules/**`) because setting it replaces them. Any new dev-only file type needs a line there. 1.x deployed `CLAUDE.md` to the live root (it returned 200 on 2026-09-27); after the launch deploy, check `https://playdela.com/CLAUDE.md` is gone and delete it over FTP if the action left it.
 
 GitHub secrets required:
 - `FTP_SERVER`: `ftp.playdela.com`
@@ -49,10 +49,11 @@ Deploys finish in ~15s. Watch with `gh run list -R sorkila/dela-web` and `gh run
 | `og.png` | 1200×630 OG image: gold Pirata "Dela" and "One line, two identical halves." beside an ivory and a gold-leaf twin, parted along a staircase cut, on the warm table. Rendered by `tools/brand.py`. |
 | `favicon.svg` + `favicon-16x16.png`, `favicon-32x32.png`, `favicon.ico` (16/32/48) | Pirata One capital 'D' in gold on a rounded `#131110` tile (outlined glyph path, no font dependency). The tile keeps it legible on light and dark tab bars. Rendered by `tools/brand.py`. |
 | `apple-touch-icon.png` | The 2.0 app icon (ivory and gold twins), 180×180, resized from `Dela/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png` by `tools/brand.py --touch-icon`. |
-| `press-kit.zip` | Press kit. **Still the 1.x kit** (lowercase, old screenshots); rebuild from `Dela/store_assets/v2/` before launch. |
+| `press-kit.zip` | 2.0 press kit (~23 MB), built by `tools/presskit.py`: `dela-press-kit/` with `icon/dela-icon-1024.png`, `screenshots/iphone/` (6.9", 1320×2868), `screenshots/ipad/` (13", 2064×2752), `screenshots/framed-iphone/` (captioned store shots), each six in store order, and `fact-sheet.txt`. Screenshots are pngquant-quantised to stay under 25 MB. If the size changes, update the press page's Assets line. |
 | `llms.txt` | Plain-text fact sheet for AI assistants. Keep in sync with the press fact sheet. |
 | `tools/brand.py` | Renders the favicons, `og.png` and (with `--touch-icon`) the touch icon from `/fonts/` (fontTools + Pillow). |
 | `tools/screens.py` | `name=path` pairs → `shots/<name>.webp` board crops. |
+| `tools/presskit.py` | Builds `press-kit.zip` from `Dela/store_assets/v2/` and the app icon. Needs `pngquant` (brew). The fact sheet text lives in the script; keep it in sync with the press page and llms.txt. |
 | `.htaccess` | Force HTTPS, HSTS, X-CTO, Referrer-Policy, ErrorDocument 404, immutable cache on fonts + static images. |
 | `sitemap.xml`, `robots.txt` | Allow indexing on `/`, `/privacy/`, `/support/`, `/press/` |
 | `fonts/inter-latin.woff2` | Variable Inter upright, 400-600 weight range, latin subset (~48KB) |
@@ -66,6 +67,7 @@ Deploys finish in ~15s. Watch with `gh run list -R sorkila/dela-web` and `gh run
 python3 tools/brand.py --touch-icon ~/Repositories/Dela/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 R=~/Repositories/Dela/store_assets/v2/raw_iphone
 python3 tools/screens.py stroke=$R/stroke.png halves=$R/halves.png landing=$R/landing.png miss=$R/miss.png hint=$R/hint.png
+python3 tools/presskit.py   # press-kit.zip
 ```
 
 `screens.py` crops a 4:5 band centred at 49.5% of the screen height (the board), which leaves out the status bar, header and footer copy. Rerun `brand.py` after palette or wordmark changes.
@@ -227,9 +229,9 @@ Force HTTPS, HSTS (1 year), `X-Content-Type-Options: nosniff`, `Referrer-Policy:
 
 ## Outstanding
 
-- **Press kit zip.** `press-kit.zip` is still the 1.x kit. Rebuild from `Dela/store_assets/v2/` (icon 1024, `framed_iphone/`, `framed_ipad/`, App Preview, a Pirata "Dela" wordmark PNG + SVG, a 2.0 about paragraph) before launch. The press page already describes the new contents.
+- **Press kit extras** (optional): a Pirata "Dela" wordmark PNG + SVG (the site renders it as text, so there is no file to ship yet) and the App Preview. Rerun `tools/presskit.py` if the store screenshots are recaptured.
 - **App Preview on the site** (optional): `Dela/store_assets/v2/preview_iphone.mp4` could run muted, looping and lazy-loaded if re-encoded to ~2-3 MB at 540 wide without audio. Not added yet.
 - **Official Apple badge artwork.**
 - **Sitemap submission** to Google Search Console.
-- **Deployed CLAUDE.md / llms.txt**: both files are in the web root and deploy with the site. llms.txt is intended to be public; CLAUDE.md probably isn't. Consider adding it to the deploy `exclude`.
+- **Stale CLAUDE.md on the server**: excluded from deploy since 2026-09-27, but 1.x put a copy in `/public_html/`. Confirm it's gone after the launch deploy.
 - **Custom logotype** drawn for Dela rather than Pirata One (deferred, costly).
