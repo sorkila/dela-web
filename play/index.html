@@ -621,8 +621,8 @@
     tl.cue(0.57, () => {
       SFX.thud(0.8); buzz(16);
       shake = { amp: 4, at: now() };
-      const mid = lastLine[Math.floor(lastLine.length / 2)];
-      ring = { x: mid.x, y: mid.y, at: now() };
+      const c = centroid(board.cells);
+      ring = { x: c.x, y: c.y, at: now() };
       emitDust(rest, 10); emitDust(twin, 10);
     });
     tl.cue(0.585, () => SFX.chord());
@@ -719,6 +719,7 @@
 
   function solved() {
     phase = 'solved'; timeline = null;
+    hintBtn.hidden = true; hintTier = 0;
     track('board-solved', { board: board.id, n: index + 1, misses });
     if (index === BOARDS.length - 1) { advanceTimer = setTimeout(showEnd, 1100); return; }
     advanceTimer = setTimeout(next, 1000);
@@ -1088,9 +1089,12 @@
       const e = (t - ring.at) / 0.6;
       if (e < 1) {
         const [X, Y] = px(ring.x, ring.y);
-        ctx.strokeStyle = 'rgba(244,217,143,' + 0.7 * (1 - e) + ')';
+        // Grow from the centre of the pair and fade out before the canvas edge.
+        const reach = Math.max(s, Math.min(X, Y, w - X, h - Y) - 6);
+        const r0 = s * 0.4, r = r0 + (reach - r0) * ease.out(e);
+        ctx.strokeStyle = 'rgba(244,217,143,' + 0.7 * (1 - e) * (1 - e) + ')';
         ctx.lineWidth = 1.5 * (1 - e) + 0.5;
-        ctx.beginPath(); ctx.arc(X, Y, s * (0.4 + Math.max(board.w, board.h) * 0.55 * ease.out(e)), 0, 7); ctx.stroke();
+        ctx.beginPath(); ctx.arc(X, Y, r, 0, 7); ctx.stroke();
       } else ring = null;
     }
     dust = dust.filter(d => t - d.at < d.life);
