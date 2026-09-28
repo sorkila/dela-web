@@ -210,6 +210,11 @@
   }
   .fineprint span { white-space: nowrap; }
   .fineprint .dot { color: var(--muted); margin: 0 0.3em; }
+  /* On narrow screens the line breaks between the pairs, never leaving a dot at a line end. */
+  @media (max-width: 560px) {
+    .fineprint .pair { display: block; }
+    .fineprint .mid { display: none; }
+  }
 
   /* A quiet cue that the page continues below the one-screen hero. */
   .more {
@@ -445,7 +450,7 @@
     </div>
 
     <p class="fineprint reveal r4">
-      <span>Free to try</span> <span class="dot">·</span> <span>No ads</span> <span class="dot">·</span> <span>No subscription</span> <span class="dot">·</span> <span>No login</span>
+      <span class="pair"><span>Free to try</span> <span class="dot">·</span> <span>No ads</span></span> <span class="dot mid">·</span> <span class="pair"><span>No subscription</span> <span class="dot">·</span> <span>No login</span></span>
     </p>
 
     <a class="more reveal r5" href="#how" aria-label="How Dela plays">
