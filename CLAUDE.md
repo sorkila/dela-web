@@ -20,7 +20,7 @@ The site exists for three jobs, in order: satisfy App Store Connect's mandatory 
 
 - Plain HTML + CSS. No framework, no JS bundler, no build step.
 - One shared stylesheet (`/style.css`) plus inline `<style>` blocks per page for page-specific rules. `style.css` also owns the spotlight + grain + view-transition chrome that reaches every page.
-- Vanilla JS on the home page only (hero figure, cursor-follow spotlight, console egg). Subpages have no JS.
+- Vanilla JS on the home page (hero figure, cursor-follow spotlight, console egg) and on `/play/` (the browser sampler). Other subpages have no JS.
 - **Self-hosted fonts** in `/fonts/`. No Google Fonts. The only outbound third-party request on the site is the Umami analytics script.
 - `tools/` holds Python scripts that render images (see Tools). They are not part of the site and are excluded from deploy.
 
@@ -40,6 +40,7 @@ Deploys finish in ~15s. Watch with `gh run list -R sorkila/dela-web` and `gh run
 | Path | Purpose |
 |---|---|
 | `index.html` | Home. One-screen hero (wordmark, tagline, lede, animated figure, App Store badge, fineprint, scroll cue), then How it plays (five steps with board crops), Chapters (plaques), Price, Questions (FAQ with FAQPage schema), closing manifesto + second badge, footer. |
+| `play/index.html` | The browser sampler: ten boards (four from chapter I, six from chapter II) on a canvas, then an end card with the App Store badge. See Play. |
 | `privacy/index.html` | Privacy policy (App Store mandatory) |
 | `support/index.html` | Support / FAQ (App Store mandatory), in three groups: Playing, Purchases, Your data. FAQPage schema. |
 | `press/index.html` | Press TL;DR, fact sheet, press kit download, contact |
@@ -142,6 +143,19 @@ Boards are real chapter II boards from `Dela/Sources/LevelsTwins.swift` (2003, 2
 Every step is a Web Animation (`element.animate`, `fill: 'forwards'`), so a cycle is `Promise.all` of their `finished` and nothing drifts on tab throttling. Gotchas: animations on the same property of the same element must not use `fill: 'both'` (a later one's backward fill overrides an earlier one); transforms use `transform-box: view-box; transform-origin: 0 0` and coordinates are baked into absolute viewBox units; parent groups (`rig`, `settle`, `squash`) only translate or scale about baked points, so the children's maths still holds; the light band's clip path is in the referencing group's space, so it moves with `settle`; a `clip-path` isolates its group, so `mix-blend-mode` inside it blends with nothing (the band uses plain opacity); the drop-shadow filter sits on an outer group and the transform on an inner one so the shadow doesn't turn with the piece.
 
 `prefers-reduced-motion`: no loop; the first board is shown split, tinted, halves parted by 5 units. The 1.x drag-to-cut interaction and "drag to cut" hint were removed with the 2.0 figure.
+
+## Play (`/play/`)
+
+Ten real boards from the app, playable with mouse or touch, for posts and press that shouldn't need an install. One self-contained page: inline style and script, no library.
+
+- **Logic** is a line-for-line port of `Dela/Sources/Twins.swift`: `split` (flood fill across cut edges), `outline`, `centroid`, `fit` (the eight symmetries in doubled coordinates, same scoring). Boards are copied from `LevelsHalves.swift` / `LevelsTwins.swift` in the row codec. Check a changed board with the node snippet in the commit that added the page, or by solving it.
+- **Stroke** follows `TableScene.follow`: the head steps one grid edge at a time; a step back needs 0.22 of a cell, a bend 0.3, straight on 0.36, release snaps at 0.5.
+- **Choreography** follows `TableScene` (part, carry, slam, settle; miss with misfit and bare cells; halves parted; unequal halves as a balance), on a small clip/cue timeline. Reduced motion swaps carries for fades.
+- **Teaching:** board 1 draws a ghost of its line until the first touch; the first twins board (2003) draws its decoy and plays the miss before handing over, like the app's rehearsal. A hint button appears after three misses: the line's ends, then the whole line.
+- **Sound** is synthesized with Web Audio (tick, lift, thud, chord, knock), off with the header toggle; `navigator.vibrate` where it exists.
+- **Storage:** `dela.web.board`, `dela.web.sound`, `dela.web.done` in localStorage (disclosed on `/privacy/`).
+- **Umami events:** `play-start`, `board-solved` (board id, position, misses), `hint`, `play-complete`, `share`, `store-click` (`where`: foot or end). This is the funnel to watch after a post.
+- Home links it under the hero badge ("Or play ten boards in your browser") and under the closing badge.
 
 ## Page structure
 

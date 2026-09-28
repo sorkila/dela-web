@@ -216,6 +216,10 @@
     .fineprint .mid { display: none; }
   }
 
+  /* The browser sampler at /play/, one quiet line under the badge. */
+  .try { margin: 12px auto 0; font-size: 15px; text-align: center; }
+  .try a { color: var(--gold); text-decoration-color: rgba(var(--gold-rgb), 0.35); text-underline-offset: 4px; }
+
   /* A quiet cue that the page continues below the one-screen hero. */
   .more {
     width: 44px;
@@ -453,6 +457,8 @@
       <span class="pair"><span>Free to try</span> <span class="dot">·</span> <span>No ads</span></span> <span class="dot mid">·</span> <span class="pair"><span>No subscription</span> <span class="dot">·</span> <span>No login</span></span>
     </p>
 
+    <p class="try reveal r4"><a href="/play/">Or play ten boards in your browser</a></p>
+
     <a class="more reveal r5" href="#how" aria-label="How Dela plays">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
     </a>
@@ -560,6 +566,7 @@
     <div class="badge-row">
       <a class="app-badge" href="https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158"><img src="/badges/app-store-black.svg" width="150" height="50" alt="Download Dela on the App Store"></a>
     </div>
+    <p class="try"><a href="/play/">Play in your browser</a></p>
   </section>
 
   <footer>

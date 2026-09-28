@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Play · Dela</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Play Dela in your browser. Draw one line across a shape and cut it into two identical halves. Ten boards, no install.">
+<meta name="theme-color" content="#131110">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://playdela.com/play/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Play Dela in your browser">
+<meta property="og:description" content="One line, two identical halves. Ten boards, no install.">
+<meta property="og:url" content="https://playdela.com/play/">
+<meta property="og:image" content="https://playdela.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Dela wordmark in gold beside two identical halves, one ivory, one gold leaf.">
+<meta property="og:site_name" content="Dela">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Play Dela in your browser">
+<meta name="twitter:description" content="One line, two identical halves. Ten boards, no install.">
+<meta name="twitter:image" content="https://playdela.com/og.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="apple-itunes-app" content="app-id=6766864158">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/inter-latin.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/pirata-one-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="6dcc31dc-88bf-40f4-b641-b362c6f1867d"></script>
+<style>
+  html, body { height: 100%; }
+  body { overscroll-behavior: none; }
+  .play {
+    position: relative;
+    z-index: 1;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+  .bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+  }
+  .crumb { margin: 0; }
+  .crumb a { display: inline-flex; align-items: center; gap: 8px; color: var(--mid); text-decoration: none; min-height: 44px; }
+  .crumb .mark { font-family: 'Pirata One', serif; font-size: 26px; color: var(--gold); line-height: 1; }
+  .bar-right { display: flex; align-items: center; gap: 6px; }
+  .count { font-family: 'Pirata One', serif; font-size: 24px; color: var(--paper); line-height: 1; font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: right; }
+  .count small { color: var(--muted); font-size: 0.72em; }
+  .icon-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: transparent; border: 0; color: var(--mid); cursor: pointer;
+  }
+  .icon-btn svg { width: 20px; height: 20px; }
+  @media (hover: hover) { .icon-btn:hover { color: var(--gold); } }
+
+  .chapter {
+    margin: clamp(8px, 3vh, 28px) 0 0;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .chapter .num { font-family: 'Pirata One', serif; font-size: 18px; letter-spacing: 0; text-transform: none; color: var(--gold); margin-right: 8px; }
+
+  .stage { position: relative; width: min(100%, 560px); aspect-ratio: 1 / 1; margin-top: 4px; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; display: block; }
+
+  .status {
+    min-height: 3.3em;
+    margin: 6px 0 0;
+    max-width: 30em;
+    text-align: center;
+    color: var(--mid);
+    font-size: 16px;
+    line-height: 1.55;
+    text-wrap: balance;
+    transition: opacity 0.25s var(--ease);
+  }
+  .status b { color: var(--paper); font-weight: 500; }
+
+  .hint-btn {
+    margin-top: 2px;
+    font: inherit; font-size: 14px; color: var(--gold);
+    background: transparent; border: 1px solid rgba(var(--gold-rgb), 0.35); border-radius: 999px;
+    padding: 9px 18px; min-height: 40px; cursor: pointer;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+  }
+  @media (hover: hover) { .hint-btn:hover { border-color: var(--gold); background: rgba(var(--gold-rgb), 0.06); } }
+
+  .foot {
+    margin-top: auto;
+    padding-top: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+  }
+  .app-badge { display: block; line-height: 0; border-radius: 9px; padding: 10px; }
+  .app-badge img { display: block; height: 40px; width: auto; }
+  .app-badge:focus-visible { outline-offset: 2px; }
+
+  /* Cards over the board: the chapter card and the end. */
+  .card {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    background: radial-gradient(closest-side, rgba(19,17,16,0.96), rgba(19,17,16,0.9) 70%, rgba(19,17,16,0));
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.45s var(--ease);
+  }
+  .card.on { opacity: 1; pointer-events: auto; }
+  .card .numeral { font-family: 'Pirata One', serif; color: var(--gold); font-size: clamp(64px, 16vw, 104px); line-height: 0.9; }
+  .card h2 { font-family: 'Pirata One', serif; font-weight: 400; font-size: clamp(30px, 7vw, 44px); line-height: 1.05; margin: 6px 0 10px; color: var(--paper); letter-spacing: 0; text-transform: none; }
+  .card h2::before { display: none; }
+  .card p { margin: 0; color: var(--mid); max-width: 24em; text-wrap: balance; }
+  .card .tap { margin-top: 18px; font-size: 13px; color: var(--muted); }
+  .card ul { list-style: none; margin: 14px 0 18px; padding: 0; display: grid; gap: 2px; font-size: 15px; color: var(--mid); }
+  .card ul span { font-family: 'Pirata One', serif; color: var(--gold); display: inline-block; width: 2.2em; text-align: right; margin-right: 10px; font-size: 17px; }
+  .card .row { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; align-items: center; margin-top: 6px; }
+  .text-btn { font: inherit; font-size: 15px; color: var(--mid); background: none; border: 0; cursor: pointer; padding: 10px 6px; min-height: 44px; text-decoration: underline; text-decoration-color: rgba(var(--paper-rgb), 0.25); text-underline-offset: 4px; }
+  @media (hover: hover) { .text-btn:hover { color: var(--gold); text-decoration-color: var(--gold-deep); } }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<main class="play">
+  <div class="bar">
+    <p class="crumb"><a href="/"><span class="arr">&larr;</span><span class="mark">Dela</span></a></p>
+    <div class="bar-right">
+      <span class="count" id="count" aria-live="polite"></span>
+      <button class="icon-btn" id="sound" type="button" aria-label="Sound on" aria-pressed="true"></button>
+    </div>
+  </div>
+
+  <h1 class="sr">Play Dela</h1>
+  <p class="chapter" id="chapter"></p>
+
+  <div class="stage" id="stage">
+    <canvas id="board" role="img" aria-label="The board"></canvas>
+    <div class="card" id="chapterCard" aria-hidden="true">
+      <div class="numeral" id="cardNum">II</div>
+      <h2 id="cardName">Twins</h2>
+      <p id="cardRule">One line. Two identical halves.</p>
+      <p class="tap">Tap to begin</p>
+    </div>
+    <div class="card" id="endCard" aria-hidden="true">
+      <div class="numeral">Dela</div>
+      <p>Those were the first two ideas. The app has seven, 85 boards in all.</p>
+      <ul>
+        <li><span>III</span>Seeds: equal beads</li>
+        <li><span>IV</span>Apart: every pair parted</li>
+        <li><span>V</span>Two of everything</li>
+        <li><span>VI</span>Thirds: two lines</li>
+        <li><span>VII</span>The exception</li>
+      </ul>
+      <a class="app-badge store-link" href="https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158" data-where="end"><img src="/badges/app-store-black.svg" alt="Download on the App Store" width="120" height="40"></a>
+      <p style="font-size:14px;color:var(--muted);margin-top:4px">Free to try on iPhone and iPad.</p>
+      <div class="row">
+        <button class="text-btn" id="share" type="button">Share</button>
+        <button class="text-btn" id="again" type="button">Play again</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="status" id="status" aria-live="polite"></p>
+  <button class="hint-btn" id="hint" type="button" hidden>Show a hint</button>
+
+  <div class="foot">
+    <a class="app-badge store-link" href="https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158" data-where="foot"><img src="/badges/app-store-black.svg" alt="Download on the App Store" width="120" height="40"></a>
+    <span>Seven chapters on iPhone and iPad. Free to try.</span>
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  // Boards from the app (Dela/Sources/LevelsHalves.swift and LevelsTwins.swift), in the
+  // app's row codec: '#' cell, '.' empty, '/' next row. Lines are grid vertices "x,y".
+  const BOARDS = [
+    { id: 1001, rule: 'halves', rows: '####', answer: '2,0 2,1' },
+    { id: 1003, rule: 'halves', rows: '###/###/##.', answer: '3,1 2,1 1,1 1,2 0,2' },
+    { id: 1005, rule: 'halves', rows: '..##./.###./#####', answer: '1,2 2,2 3,2 4,2' },
+    { id: 1008, rule: 'halves', rows: '#..##./######/.##.../..#...', answer: '2,1 2,2 3,2' },
+    { id: 2003, rule: 'twins', rows: '#.../###./####', answer: '1,3 1,2 2,2 2,1', decoy: '0,2 1,2 2,2 3,2' },
+    { id: 2004, rule: 'twins', rows: '##../##../####', answer: '2,1 1,1 1,2 1,3' },
+    { id: 2005, rule: 'twins', rows: '####./#####/#....', answer: '2,0 2,1 2,2' },
+    { id: 2009, rule: 'twins', rows: '######/.#####/.###..', answer: '3,3 3,2 3,1 3,0' },
+    { id: 2011, rule: 'twins', rows: '.##../.####/####./####./.##..', answer: '1,2 2,2 2,3 3,3 4,3' },
+    { id: 2013, rule: 'twins', rows: '..###/.####/.####/####./###..', answer: '2,1 2,2 3,2 3,3 3,4' },
+  ];
+  const CHAPTERS = {
+    halves: { num: 'I', name: 'Halves', rule: 'One line. Two equal halves.' },
+    twins: { num: 'II', name: 'Twins', rule: 'One line. Two identical halves.' },
+  };
+
+  // ---------------------------------------------------------------- logic (port of Twins.swift)
+
+  const key = (x, y) => x + ',' + y;
+  const unkey = k => { const [x, y] = k.split(',').map(Number); return { x, y }; };
+  const path = s => (s || '').split(' ').filter(Boolean).map(unkey);
+
+  function parseRows(rows) {
+    const cells = new Set();
+    let w = 0, h = 0;
+    rows.split('/').forEach((row, y) => {
+      [...row].forEach((ch, x) => { if (ch !== '.') { cells.add(key(x, y)); w = Math.max(w, x + 1); h = Math.max(h, y + 1); } });
+    });
+    return { cells, w, h };
+  }
+
+  // The cell boundary a unit segment of the line lies on.
+  function edgeBetween(a, b) {
+    if (a.y === b.y && Math.abs(a.x - b.x) === 1) return 'h' + Math.min(a.x, b.x) + ',' + a.y;
+    if (a.x === b.x && Math.abs(a.y - b.y) === 1) return 'v' + a.x + ',' + Math.min(a.y, b.y);
+    return null;
+  }
+
+  function split(cells, line) {
+    const cut = new Set();
+    for (let i = 1; i < line.length; i++) { const e = edgeBetween(line[i - 1], line[i]); if (e) cut.add(e); }
+    const order = [...cells].map(unkey).sort((a, b) => a.y - b.y || a.x - b.x);
+    const seen = new Set(), out = [];
+    for (const s of order) {
+      const sk = key(s.x, s.y);
+      if (seen.has(sk)) continue;
+      const comp = new Set([sk]); seen.add(sk);
+      const stack = [s];
+      while (stack.length) {
+        const c = stack.pop();
+        const nbrs = [
+          [c.x + 1, c.y, 'v' + (c.x + 1) + ',' + c.y],
+          [c.x - 1, c.y, 'v' + c.x + ',' + c.y],
+          [c.x, c.y + 1, 'h' + c.x + ',' + (c.y + 1)],
+          [c.x, c.y - 1, 'h' + c.x + ',' + c.y],
+        ];
+        for (const [nx, ny, e] of nbrs) {
+          const nk = key(nx, ny);
+          if (cells.has(nk) && !seen.has(nk) && !cut.has(e)) { seen.add(nk); comp.add(nk); stack.push({ x: nx, y: ny }); }
+        }
+      }
+      out.push(comp);
+    }
+    return out;
+  }
+
+  function centroid(cells) {
+    let x = 0, y = 0;
+    for (const k of cells) { const c = unkey(k); x += c.x + 0.5; y += c.y + 0.5; }
+    return { x: x / cells.size, y: y / cells.size };
+  }
+
+  function outline(cells) {
+    const next = new Map();
+    const add = (a, b) => { const k = key(a[0], a[1]); if (!next.has(k)) next.set(k, []); next.get(k).push(b); };
+    for (const k of cells) {
+      const { x, y } = unkey(k);
+      if (!cells.has(key(x, y - 1))) add([x, y], [x + 1, y]);
+      if (!cells.has(key(x + 1, y))) add([x + 1, y], [x + 1, y + 1]);
+      if (!cells.has(key(x, y + 1))) add([x + 1, y + 1], [x, y + 1]);
+      if (!cells.has(key(x - 1, y))) add([x, y + 1], [x, y]);
+    }
+    const loops = [];
+    while (next.size) {
+      const startK = [...next.keys()].map(unkey).sort((a, b) => a.y - b.y || a.x - b.x)[0];
+      let cur = [startK.x, startK.y];
+      const loop = [cur];
+      for (let guard = 0; guard < 4096; guard++) {
+        const k = key(cur[0], cur[1]);
+        const outs = next.get(k);
+        if (!outs || !outs.length) break;
+        const n = outs.shift();
+        if (!outs.length) next.delete(k);
+        cur = n;
+        if (cur[0] === startK.x && cur[1] === startK.y) break;
+        loop.push(cur);
+      }
+      loops.push(loop.filter((c, i) => {
+        const p = loop[(i - 1 + loop.length) % loop.length], n = loop[(i + 1) % loop.length];
+        return !((p[0] === c[0] && c[0] === n[0]) || (p[1] === c[1] && c[1] === n[1]));
+      }));
+    }
+    return loops;
+  }
+
+  // Flip (mirror in x), then quarter turns clockwise on screen (y down).
+  function transform(x, y, flipped, turns) {
+    if (flipped) x = -x;
+    for (let i = 0; i < turns % 4; i++) { const t = x; x = -y; y = t; }
+    return [x, y];
+  }
+
+  // The placement of `moving` over `resting` with the most cells in common.
+  function fit(moving, resting) {
+    const rest = [...resting].map(unkey), mov = [...moving].map(unkey);
+    const restKeys = new Set(rest.map(c => key(2 * c.x + 1, 2 * c.y + 1)));
+    const cA = centroid(resting), cB = centroid(moving);
+    let best = null;
+    for (const flipped of [false, true]) {
+      for (let turns = 0; turns < 4; turns++) {
+        const mapped = mov.map(c => { const [x, y] = transform(2 * c.x + 1, 2 * c.y + 1, flipped, turns); return { c, x: Math.round(x), y: Math.round(y) }; });
+        const offsets = new Set();
+        for (const a of restKeys) { const A = unkey(a); for (const m of mapped) offsets.add(key(A.x - m.x, A.y - m.y)); }
+        const [mcx, mcy] = transform(cB.x * 2, cB.y * 2, flipped, turns);
+        for (const ok of offsets) {
+          const o = unkey(ok);
+          let overlap = 0;
+          const misfit = new Set(), covered = new Set();
+          for (const m of mapped) {
+            const k = key(m.x + o.x, m.y + o.y);
+            covered.add(k);
+            if (restKeys.has(k)) overlap++; else misfit.add(key(m.c.x, m.c.y));
+          }
+          const target = { x: (mcx + o.x) / 2, y: (mcy + o.y) / 2 };
+          const dist = Math.hypot(target.x - cA.x, target.y - cA.y);
+          const turnCost = turns === 0 ? 0 : (turns === 2 ? 1 : 0.5);
+          const score = overlap * 1000 - dist * 10 - (flipped ? 3 : 0) - turnCost;
+          if (!best || score > best.score) {
+            const bare = new Set(rest.filter(c => !covered.has(key(2 * c.x + 1, 2 * c.y + 1))).map(c => key(c.x, c.y)));
+            best = { score, flipped, turns, target, misfit, bare, exact: overlap === resting.size && resting.size === moving.size };
+          }
+        }
+      }
+    }
+    const angle = [0, Math.PI / 2, Math.PI, -Math.PI / 2][best.turns % 4];
+    return { ...best, angle };
+  }
+
+  // ---------------------------------------------------------------- sound
+
+  let audio = null, soundOn = true;
+  try { soundOn = localStorage.getItem('dela.web.sound') !== 'off'; } catch (e) {}
+  function ac() {
+    if (!soundOn) return null;
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+    if (audio.state === 'suspended') audio.resume();
+    return audio;
+  }
+  function tone(type, f0, f1, dur, gain, delay = 0) {
+    const a = ac(); if (!a) return;
+    const t = a.currentTime + delay;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, t);
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(a.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noise(dur, gain, freq) {
+    const a = ac(); if (!a) return;
+    const n = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    s.buffer = buf; f.type = 'lowpass'; f.frequency.value = freq; g.gain.value = gain;
+    s.connect(f).connect(g).connect(a.destination); s.start();
+  }
+  const SFX = {
+    tick: () => tone('sine', 2100, 2100, 0.03, 0.012),
+    lift: () => noise(0.18, 0.05, 900),
+    thud: w => { tone('sine', 96, 42, 0.32, 0.55 * w); noise(0.07, 0.35 * w, 380); },
+    chord: () => { [392, 587.33, 783.99].forEach((f, i) => tone('sine', f, f, 1.3, 0.05, 0.015 + i * 0.03)); },
+    knock: () => { tone('triangle', 230, 170, 0.1, 0.12); tone('triangle', 200, 150, 0.1, 0.08, 0.09); },
+  };
+  const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+  const track = (name, data) => { try { window.umami && window.umami.track(name, data); } catch (e) {} };
+
+  // ---------------------------------------------------------------- state
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  const $ = id => document.getElementById(id);
+  const statusEl = $('status'), hintBtn = $('hint');
+
+  let index = 0;
+  try { const saved = parseInt(localStorage.getItem('dela.web.board'), 10); if (saved >= 0 && saved < BOARDS.length) index = saved; } catch (e) {}
+
+  let board, pieces, phase, stroke, seam, seamAlpha, timeline, misses, hintTier, guide, rehearsing, touched;
+  let ring = null, dust = [], shake = { amp: 0, at: 0 }, misfit = null, lineFade = null;
+  let layout = { s: 40, ox: 0, oy: 0, w: 0, h: 0, dpr: 1 };
+  let advanceTimer = null, statusTimer = null;
+
+  function makePiece(cells, role) {
+    return { cells, role, cent: centroid(cells), loops: outline(cells), ox: 0, oy: 0, angle: 0, flip: 1, lift: 0, scale: 1, tint: 0, glow: 0, opacity: 1 };
+  }
+
+  function load(i, { card = true } = {}) {
+    clearTimeout(advanceTimer);
+    index = i;
+    try { localStorage.setItem('dela.web.board', String(i)); } catch (e) {}
+    const b = BOARDS[i];
+    const p = parseRows(b.rows);
+    board = { ...b, ...p, answerPath: path(b.answer), decoyPath: path(b.decoy) };
+    pieces = [makePiece(board.cells, 'whole')];
+    phase = 'idle'; stroke = null; seam = null; seamAlpha = 0; timeline = null;
+    misses = 0; hintTier = 0; guide = null; rehearsing = false; touched = false; misfit = null;
+    hintBtn.hidden = true;
+    hintBtn.textContent = 'Show a hint';
+    const ch = CHAPTERS[b.rule];
+    $('chapter').innerHTML = '<span class="num">' + ch.num + '</span>' + ch.name;
+    $('count').innerHTML = (i + 1) + '<small> / ' + BOARDS.length + '</small>';
+    canvas.setAttribute('aria-label', 'Board ' + (i + 1) + ': ' + spoken(board));
+    setStatus(i === 0 ? 'Draw one line along the grid, from edge to edge.<br><b>' + ch.rule + '</b>' : ch.rule);
+    resize();
+    const firstOfChapter = i === 0 || BOARDS[i - 1].rule !== b.rule;
+    if (firstOfChapter && i > 0 && card) showChapterCard(ch);
+    else if (board.decoyPath.length && firstOfChapter) setTimeout(rehearse, 600);
+    if (i === 0) guide = { at: now() + 0.6 };
+  }
+
+  function spoken(b) {
+    const rows = b.rows.split('/').map(r => [...r].map(c => c === '.' ? 'gap' : 'cell').join(' '));
+    return b.cells.size + ' cells in ' + rows.length + ' rows. ' + rows.map((r, i) => 'Row ' + (i + 1) + ': ' + r + '.').join(' ');
+  }
+
+  function setStatus(html, holdMs) {
+    clearTimeout(statusTimer);
+    statusEl.innerHTML = html;
+    if (holdMs) statusTimer = setTimeout(() => { statusEl.innerHTML = CHAPTERS[board.rule].rule; }, holdMs);
+  }
+
+  function showChapterCard(ch) {
+    const card = $('chapterCard');
+    $('cardNum').textContent = ch.num; $('cardName').textContent = ch.name; $('cardRule').textContent = ch.rule;
+    card.classList.add('on'); card.setAttribute('aria-hidden', 'false');
+    phase = 'card';
+    const go = () => {
+      card.classList.remove('on'); card.setAttribute('aria-hidden', 'true');
+      card.removeEventListener('pointerdown', go);
+      phase = 'idle';
+      if (board.decoyPath.length) setTimeout(rehearse, 450);
+    };
+    card.addEventListener('pointerdown', go);
+    setTimeout(() => { if (phase === 'card') go(); }, 2600);
+  }
+
+  // The first twins board draws its tempting wrong line and plays the miss, then hands over.
+  function rehearse() {
+    if (touched || phase !== 'idle') return;
+    rehearsing = true;
+    phase = 'anim';
+    const line = board.decoyPath;
+    const t0 = now(), dur = 0.9;
+    stroke = { points: [line[0]], tip: { x: line[0].x, y: line[0].y }, auto: true };
+    const step = () => {
+      if (!rehearsing) return;
+      const e = Math.min(1, (now() - t0) / dur);
+      const pos = e * (line.length - 1);
+      const i = Math.floor(pos);
+      stroke.points = line.slice(0, i + 1);
+      const a = line[Math.min(i, line.length - 1)], b = line[Math.min(i + 1, line.length - 1)];
+      stroke.tip = { x: a.x + (b.x - a.x) * (pos - i), y: a.y + (b.y - a.y) * (pos - i) };
+      if (e < 1) requestAnimationFrame(step);
+      else { const pts = line.slice(); stroke = null; commit(pts); setStatus('Equal halves, but not the same shape.<br><b>Find the line that makes twins.</b>', 5200); }
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---------------------------------------------------------------- timeline
+
+  const now = () => performance.now() / 1000;
+  const ease = {
+    linear: e => e,
+    out: e => 1 - Math.pow(1 - e, 3),
+    inOut: e => e < 0.5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2,
+    inQuad: e => e * e,
+  };
+  function Timeline() {
+    const clips = [], cues = [];
+    let end = 0;
+    return {
+      clip(start, dur, ez, fn) { clips.push({ start, dur, ez, fn }); end = Math.max(end, start + dur); },
+      cue(t, fn) { cues.push({ t, fn, done: false }); end = Math.max(end, t); },
+      run(t) {
+        for (const c of clips) if (t >= c.start) c.fn(ease[c.ez](Math.min(1, c.dur <= 0 ? 1 : (t - c.start) / c.dur)));
+        for (const q of cues) if (!q.done && t >= q.t) { q.done = true; q.fn(); }
+        return t >= end;
+      },
+    };
+  }
+  function play(tl) { timeline = { tl, t0: now() }; phase = 'anim'; }
+
+  // ---------------------------------------------------------------- choreography (after TableScene.swift)
+
+  function part(tl, rest, twin) {
+    const dx = twin.cent.x - rest.cent.x, dy = twin.cent.y - rest.cent.y, l = Math.max(0.001, Math.hypot(dx, dy));
+    const n = { x: dx / l, y: dy / l };
+    tl.clip(0, 0.14, 'out', e => {
+      twin.ox = n.x * 0.06 * e; twin.oy = n.y * 0.06 * e;
+      rest.ox = -n.x * 0.02 * e; rest.oy = -n.y * 0.02 * e;
+      rest.tint = e; twin.tint = e; seamAlpha = 1 - e;
+    });
+    tl.cue(0.14, () => { seam = null; });
+    return { x: n.x * 0.06, y: n.y * 0.06, n };
+  }
+
+  function carry(tl, rest, twin, start, f, restOff, t0, dur) {
+    const target = { x: f.target.x - twin.cent.x + restOff.x, y: f.target.y - twin.cent.y + restOff.y };
+    const lift = 0.16;
+    tl.cue(t0, () => SFX.lift());
+    tl.clip(t0, lift, 'out', e => { twin.lift = e; twin.scale = 1 + 0.06 * e; });
+    tl.clip(t0 + lift, dur, 'inOut', e => {
+      twin.ox = start.x + (target.x - start.x) * e; twin.oy = start.y + (target.y - start.y) * e;
+      twin.angle = f.angle * e;
+      twin.flip = f.flipped ? 1 - 2 * e : 1;
+      twin.lift = 1 + 0.25 * Math.sin(Math.PI * e);
+    });
+    return t0 + lift + dur;
+  }
+
+  function impact(w, piece) {
+    SFX.thud(w); buzz(w >= 1 ? 18 : 8);
+    if (reduceMotion) return;
+    shake = { amp: 6 * w, at: now() };
+    if (w >= 1 && piece) {
+      ring = { x: piece.cent.x + piece.ox, y: piece.cent.y + piece.oy, at: now() };
+      emitDust(piece, 22);
+    }
+  }
+
+  function landing(rest, twin, f) {
+    const tl = Timeline();
+    const start = part(tl, rest, twin);
+    const restOff = { x: -start.x / 3, y: -start.y / 3 };
+    if (reduceMotion) {
+      tl.clip(0.14, 0.18, 'inOut', e => { twin.opacity = 1 - e; });
+      tl.cue(0.32, () => {
+        twin.ox = f.target.x - twin.cent.x; twin.oy = f.target.y - twin.cent.y; twin.angle = f.angle; twin.flip = f.flipped ? -1 : 1;
+        SFX.chord();
+      });
+      tl.clip(0.32, 0.2, 'inOut', e => { twin.opacity = e; twin.glow = 0.2 * e; });
+      tl.cue(0.6, solved);
+      return tl;
+    }
+    let t = carry(tl, rest, twin, start, f, restOff, 0.1, 0.5);
+    tl.clip(t, 0.1, 'inQuad', e => { twin.lift = 1 - e; twin.scale = 1.06 - 0.06 * e; });
+    t += 0.1;
+    tl.cue(t, () => impact(1, twin));
+    tl.cue(t + 0.015, () => SFX.chord());
+    tl.clip(t, 0.18, 'linear', e => { twin.scale = 1 - 0.035 * Math.sin(Math.PI * e); });
+    tl.clip(t, 0.34, 'out', e => { twin.glow = 1 - 0.8 * e; });
+    const twinAt = { x: f.target.x - twin.cent.x + restOff.x, y: f.target.y - twin.cent.y + restOff.y };
+    const shift = { x: board.w / 2 - rest.cent.x - restOff.x, y: board.h / 2 - rest.cent.y - restOff.y };
+    tl.clip(t + 0.14, 0.4, 'out', e => {
+      rest.ox = restOff.x + shift.x * e; rest.oy = restOff.y + shift.y * e;
+      twin.ox = twinAt.x + shift.x * e; twin.oy = twinAt.y + shift.y * e;
+    });
+    tl.cue(t + 0.54, solved);
+    return tl;
+  }
+
+  function miss(rest, twin, f) {
+    const tl = Timeline();
+    const start = part(tl, rest, twin);
+    const restOff = { x: -start.x / 3, y: -start.y / 3 };
+    const hover = { x: f.target.x - twin.cent.x + restOff.x, y: f.target.y - twin.cent.y + restOff.y };
+    let t = reduceMotion ? 0.16 : carry(tl, rest, twin, start, f, restOff, 0.08, 0.36);
+    if (reduceMotion) {
+      tl.cue(0.16, () => { twin.ox = hover.x; twin.oy = hover.y; twin.angle = f.angle; twin.flip = f.flipped ? -1 : 1; });
+    } else {
+      tl.clip(t, 0.08, 'inQuad', e => { twin.lift = 1 - 0.7 * e; });
+      t += 0.08;
+    }
+    tl.cue(t, () => { misfit = { moving: f.misfit, bare: f.bare, alpha: 0 }; SFX.knock(); buzz(10); });
+    tl.clip(t, 0.3, 'linear', e => { if (misfit) misfit.alpha = Math.min(1, e * 4); });
+    tl.clip(t + 0.3, 0.2, 'linear', e => { if (misfit) misfit.alpha = 1 - e; });
+    if (!reduceMotion) tl.clip(t, 0.3, 'linear', e => { twin.angle = f.angle + Math.sin(e * Math.PI * 3) * 0.045 * (1 - e); });
+    tl.cue(t + 0.5, () => { misfit = null; });
+    t += 0.3;
+    tl.clip(t, 0.2, 'out', e => {
+      twin.ox = hover.x + (start.x - hover.x) * e; twin.oy = hover.y + (start.y - hover.y) * e;
+      twin.angle = f.angle * (1 - e);
+      twin.flip = f.flipped ? -1 + 2 * e : 1;
+      twin.lift = 0.3 * (1 - e); twin.scale = 1.06 - 0.06 * e;
+    });
+    if (!reduceMotion) tl.cue(t + 0.2, () => impact(0.3));
+    tl.clip(t + 0.1, 0.2, 'inOut', e => {
+      rest.tint = 1 - e; twin.tint = 1 - e;
+      rest.ox = restOff.x * (1 - e); rest.oy = restOff.y * (1 - e);
+    });
+    tl.clip(t + 0.3, 0.1, 'out', e => { twin.ox = start.x * (1 - e); twin.oy = start.y * (1 - e); });
+    tl.cue(t + 0.52, heal);
+    return tl;
+  }
+
+  function halvesParted(rest, twin) {
+    const tl = Timeline();
+    const start = part(tl, rest, twin);
+    const n = start.n;
+    if (reduceMotion) { tl.cue(0.2, () => SFX.chord()); tl.cue(0.5, solved); return tl; }
+    tl.cue(0.1, () => SFX.lift());
+    tl.clip(0.1, 0.16, 'out', e => { rest.lift = twin.lift = 0.5 * e; rest.scale = twin.scale = 1 + 0.03 * e; });
+    tl.clip(0.14, 0.34, 'inOut', e => {
+      twin.ox = start.x + n.x * 0.16 * e; twin.oy = start.y + n.y * 0.16 * e;
+      rest.ox = -n.x * (0.02 + 0.16 * e); rest.oy = -n.y * (0.02 + 0.16 * e);
+    });
+    tl.clip(0.48, 0.09, 'inQuad', e => { rest.lift = twin.lift = 0.5 * (1 - e); rest.scale = twin.scale = 1.03 - 0.03 * e; });
+    tl.cue(0.57, () => {
+      SFX.thud(0.8); buzz(16);
+      shake = { amp: 4, at: now() };
+      const mid = lastLine[Math.floor(lastLine.length / 2)];
+      ring = { x: mid.x, y: mid.y, at: now() };
+      emitDust(rest, 10); emitDust(twin, 10);
+    });
+    tl.cue(0.585, () => SFX.chord());
+    tl.clip(0.57, 0.34, 'out', e => { twin.glow = 1 - 0.8 * e; rest.glow = 0.5 * (1 - e); });
+    tl.cue(1.0, solved);
+    return tl;
+  }
+
+  // Unequal halves behave like a balance: the lighter side rises, the heavier stays down.
+  function halvesUneven(rest, twin) {
+    const tl = Timeline();
+    const start = part(tl, rest, twin);
+    const restHeavier = rest.cells.size > twin.cells.size;
+    tl.cue(0.14, () => { SFX.knock(); buzz(10); });
+    tl.clip(0.14, 0.12, 'out', e => { rest.tint = twin.tint = 1 - 0.55 * e; });
+    if (!reduceMotion) {
+      const up = restHeavier ? { r: 0.05, t: 0.8 } : { r: 0.8, t: 0.05 };
+      const grow = restHeavier ? { r: 0, t: 0.05 } : { r: 0.05, t: 0 };
+      tl.clip(0.12, 0.24, 'out', e => { rest.lift = up.r * e; twin.lift = up.t * e; rest.scale = 1 + grow.r * e; twin.scale = 1 + grow.t * e; });
+      tl.clip(0.36, 0.3, 'linear', e => {
+        const wob = Math.sin(e * Math.PI * 3) * 0.04 * (1 - e);
+        rest.angle = restHeavier ? 0 : wob; twin.angle = restHeavier ? wob : 0;
+      });
+      tl.clip(0.66, 0.12, 'inQuad', e => { rest.lift = up.r * (1 - e); twin.lift = up.t * (1 - e); rest.scale = 1 + grow.r * (1 - e); twin.scale = 1 + grow.t * (1 - e); });
+      tl.cue(0.78, () => SFX.thud(0.3));
+    }
+    const healAt = reduceMotion ? 0.4 : 0.76;
+    tl.clip(healAt, 0.2, 'inOut', e => {
+      rest.tint = twin.tint = 0.45 * (1 - e);
+      rest.ox = -start.x / 3 * (1 - e); rest.oy = -start.y / 3 * (1 - e);
+      twin.ox = start.x * (1 - e); twin.oy = start.y * (1 - e);
+    });
+    tl.cue(healAt + 0.22, heal);
+    return tl;
+  }
+
+  function tooMany() {
+    const tl = Timeline();
+    tl.clip(0, 0.14, 'out', e => { for (const p of pieces) p.tint = 0.45 * e; seamAlpha = 1 - e; });
+    tl.cue(0.14, () => { seam = null; SFX.knock(); buzz(10); });
+    tl.clip(0.6, 0.2, 'inOut', e => { for (const p of pieces) p.tint = 0.45 * (1 - e); });
+    tl.cue(0.82, heal);
+    return tl;
+  }
+
+  function heal() {
+    pieces = [makePiece(board.cells, 'whole')];
+    phase = 'idle'; timeline = null; misfit = null;
+    if (rehearsing) { rehearsing = false; return; }
+  }
+
+  let lastLine = [], started = false;
+  function commit(line) {
+    const parts = split(board.cells, line);
+    if (parts.length < 2) {
+      lineFade = { points: line, at: now() };
+      if (!rehearsing) setStatus('Draw all the way across, <b>from edge to edge.</b>', 2600);
+      return;
+    }
+    lastLine = line; seam = line; seamAlpha = 1;
+    if (parts.length > 2) {
+      pieces = parts.map(c => makePiece(c, 'whole'));
+      noteMiss();
+      setStatus('That made ' + parts.length + ' parts. <b>One line makes two.</b>', 2600);
+      play(tooMany());
+      return;
+    }
+    const rest = makePiece(parts[0], 'rest'), twin = makePiece(parts[1], 'twin');
+    pieces = [rest, twin];
+    const a = rest.cells.size, b = twin.cells.size;
+    if (a !== b) {
+      noteMiss();
+      setStatus(Math.min(a, b) + ' and ' + Math.max(a, b) + ' cells. <b>Not equal.</b>', 2600);
+      play(halvesUneven(rest, twin));
+    } else if (board.rule === 'halves') {
+      setStatus('<b>Equal.</b>');
+      play(halvesParted(rest, twin));
+    } else {
+      const f = fit(twin.cells, rest.cells);
+      if (f.exact) { setStatus('<b>Twins.</b>'); play(landing(rest, twin, f)); }
+      else {
+        noteMiss();
+        if (!rehearsing) setStatus('Equal, but not the same shape. <b>The glowing cells don’t fit.</b>', 2800);
+        play(miss(rest, twin, f));
+      }
+    }
+  }
+
+  function noteMiss() {
+    if (rehearsing) return;
+    misses++;
+    if (misses >= 3 && hintTier < 2) hintBtn.hidden = false;
+  }
+
+  function solved() {
+    phase = 'solved'; timeline = null;
+    track('board-solved', { board: board.id, n: index + 1, misses });
+    if (index === BOARDS.length - 1) { advanceTimer = setTimeout(showEnd, 1100); return; }
+    advanceTimer = setTimeout(next, 1000);
+  }
+  function next() { if (phase !== 'solved') return; load(index + 1); }
+
+  function showEnd() {
+    track('play-complete');
+    const card = $('endCard');
+    card.classList.add('on'); card.setAttribute('aria-hidden', 'false');
+    phase = 'end';
+    pieces = []; seam = null; ring = null; dust = [];
+    document.querySelector('.foot').style.visibility = 'hidden';
+    hintBtn.hidden = true;
+    setStatus('');
+    try { localStorage.setItem('dela.web.done', '1'); } catch (e) {}
+  }
+
+  hintBtn.addEventListener('click', () => {
+    hintTier = Math.min(2, hintTier + 1);
+    track('hint', { board: board.id, tier: hintTier });
+    if (hintTier >= 2) hintBtn.hidden = true;
+    else hintBtn.textContent = 'Show the whole line';
+    setStatus(hintTier === 1 ? 'The line starts and ends at the glowing points.' : 'Trace the glowing line.');
+  });
+
+  $('again').addEventListener('click', () => {
+    const card = $('endCard'); card.classList.remove('on'); card.setAttribute('aria-hidden', 'true');
+    document.querySelector('.foot').style.visibility = '';
+    load(0, { card: false });
+  });
+  $('share').addEventListener('click', async () => {
+    const data = { title: 'Dela', text: 'One line. Two identical halves.', url: 'https://playdela.com/play/' };
+    track('share');
+    try {
+      if (navigator.share) { await navigator.share(data); return; }
+      await navigator.clipboard.writeText(data.url);
+      $('share').textContent = 'Link copied';
+      setTimeout(() => { $('share').textContent = 'Share'; }, 1800);
+    } catch (e) {}
+  });
+  document.querySelectorAll('.store-link').forEach(a => a.addEventListener('click', () => track('store-click', { where: a.dataset.where, board: index + 1 })));
+
+  const soundBtn = $('sound');
+  const drawSound = () => {
+    soundBtn.innerHTML = soundOn
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6"/><path d="M18 6.5a7.6 7.6 0 0 1 0 11"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundBtn.setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off');
+  };
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    try { localStorage.setItem('dela.web.sound', soundOn ? 'on' : 'off'); } catch (e) {}
+    drawSound();
+  });
+  drawSound();
+
+  // ---------------------------------------------------------------- input (after TableScene.follow)
+
+  function toGrid(ev) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (ev.clientX - r.left - layout.ox) / layout.s, y: (ev.clientY - r.top - layout.oy) / layout.s };
+  }
+  const clampV = v => ({ x: Math.max(0, Math.min(board.w, v.x)), y: Math.max(0, Math.min(board.h, v.y)) });
+
+  // Steps the head of the line toward the finger one grid edge at a time. A step back needs less
+  // travel than a bend, and a bend less than going straight on, so the line feels sure.
+  function follow(p, release) {
+    const pts = stroke.points;
+    for (let guard = 0; guard < 32; guard++) {
+      const h = pts[pts.length - 1], prev = pts[pts.length - 2];
+      const dx = p.x - h.x, dy = p.y - h.y;
+      const horiz = Math.abs(dx) >= Math.abs(dy);
+      const d = horiz ? dx : dy;
+      const c = clampV(horiz ? { x: h.x + Math.sign(d), y: h.y } : { x: h.x, y: h.y + Math.sign(d) });
+      if (c.x === h.x && c.y === h.y) break;
+      const back = !!prev && prev.x === c.x && prev.y === c.y;
+      const straight = !!prev && (horiz ? h.x !== prev.x : h.y !== prev.y);
+      const need = release ? 0.5 : back ? 0.22 : straight ? 0.36 : 0.3;
+      if (Math.abs(d) < need) break;
+      if (back) { pts.pop(); continue; }
+      if (pts.some(q => q.x === c.x && q.y === c.y)) break;
+      pts.push(c);
+      SFX.tick();
+    }
+    stroke.tip = p;
+  }
+
+  canvas.addEventListener('pointerdown', ev => {
+    if (phase === 'solved') { clearTimeout(advanceTimer); next(); return; }
+    if (phase !== 'idle') return;
+    ac();
+    ev.preventDefault();
+    try { canvas.setPointerCapture(ev.pointerId); } catch (e) {}
+    touched = true; guide = null;
+    if (!started) { started = true; track('play-start', { board: index + 1 }); }
+    const g = toGrid(ev);
+    const v = clampV({ x: Math.round(g.x), y: Math.round(g.y) });
+    stroke = { points: [v], tip: g, id: ev.pointerId };
+    phase = 'drawing';
+  });
+  canvas.addEventListener('pointermove', ev => {
+    if (phase !== 'drawing' || !stroke || ev.pointerId !== stroke.id) return;
+    const evs = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev];
+    for (const e of (evs.length ? evs : [ev])) follow(toGrid(e), false);
+  });
+  const end = ev => {
+    if (phase !== 'drawing' || !stroke || ev.pointerId !== stroke.id) return;
+    follow(toGrid(ev), true);
+    const pts = stroke.points;
+    stroke = null;
+    phase = 'idle';
+    if (pts.length < 2) return;
+    commit(pts);
+  };
+  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointercancel', ev => { if (stroke && ev.pointerId === stroke.id) { stroke = null; phase = 'idle'; } });
+
+  // ---------------------------------------------------------------- rendering (after LacquerBoard.swift)
+
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    const dpr = Math.min(3, window.devicePixelRatio || 1);
+    canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+    const span = Math.max(board.w, board.h) + 1.4;
+    const s = Math.min(r.width, r.height) / span;
+    layout = { s, ox: (r.width - board.w * s) / 2, oy: (r.height - board.h * s) / 2, w: r.width, h: r.height, dpr };
+  }
+  addEventListener('resize', () => board && resize());
+
+  const px = (x, y) => [layout.ox + x * layout.s, layout.oy + y * layout.s];
+
+  function roundedLoops(loops, r) {
+    const p = new Path2D();
+    for (const loop of loops) {
+      const n = loop.length;
+      for (let i = 0; i < n; i++) {
+        const a = loop[(i - 1 + n) % n], c = loop[i], b = loop[(i + 1) % n];
+        const [cx, cy] = px(c[0], c[1]);
+        const [ax, ay] = px((a[0] + c[0]) / 2, (a[1] + c[1]) / 2);
+        const [bx, by] = px((b[0] + c[0]) / 2, (b[1] + c[1]) / 2);
+        if (i === 0) p.moveTo(ax, ay); else p.lineTo(ax, ay);
+        p.arcTo(cx, cy, bx, by, r);
+      }
+      p.closePath();
+    }
+    return p;
+  }
+
+  function cellRect(k, inset) {
+    const c = unkey(k);
+    const [x, y] = px(c.x, c.y);
+    return [x + inset, y + inset, layout.s - 2 * inset, layout.s - 2 * inset];
+  }
+
+  function withPiece(p, fn) {
+    const [cx, cy] = px(p.cent.x, p.cent.y);
+    ctx.save();
+    ctx.translate(cx + p.ox * layout.s, cy + p.oy * layout.s);
+    ctx.rotate(p.angle);
+    ctx.scale(p.flip * p.scale, p.scale);
+    ctx.translate(-cx, -cy);
+    fn();
+    ctx.restore();
+  }
+
+  function material(p, path, bounds) {
+    const [x0, y0, x1, y1] = bounds;
+    // Lacquer body, then the tint towards ivory (rest) or gold leaf (twin).
+    const lac = ctx.createLinearGradient(0, y0, 0, y1);
+    lac.addColorStop(0, '#2E2823'); lac.addColorStop(1, '#141110');
+    ctx.fillStyle = lac; ctx.fill(path);
+    if (p.tint > 0.001) {
+      ctx.globalAlpha = p.opacity * Math.min(1, p.tint);
+      let g;
+      if (p.role === 'twin') {
+        g = ctx.createLinearGradient(x0, y0, x1, y1);
+        g.addColorStop(0, '#FAE094'); g.addColorStop(0.3, '#DBA847'); g.addColorStop(0.58, '#8C5E1C'); g.addColorStop(0.8, '#CC993D'); g.addColorStop(1, '#F2D17A');
+      } else if (p.role === 'rest') {
+        g = ctx.createLinearGradient(0, y0, 0, y1);
+        g.addColorStop(0, '#EDE6D6'); g.addColorStop(1, '#BDB09C');
+      } else {
+        g = 'rgba(80,72,64,1)';
+      }
+      ctx.fillStyle = g; ctx.fill(path);
+      ctx.globalAlpha = p.opacity;
+    }
+    // Sheen from the lamp above.
+    const sh = ctx.createLinearGradient(0, y0, 0, y1);
+    sh.addColorStop(0, p.role === 'twin' && p.tint > 0.5 ? 'rgba(255,240,200,0.28)' : 'rgba(255,242,220,0.10)');
+    sh.addColorStop(0.5, 'rgba(255,242,220,0)');
+    ctx.fillStyle = sh; ctx.fill(path);
+  }
+
+  function drawPiece(p, t) {
+    const s = layout.s;
+    const path = roundedLoops(p.loops, s * 0.1);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const l of p.loops) for (const v of l) { const [X, Y] = px(v[0], v[1]); x0 = Math.min(x0, X); y0 = Math.min(y0, Y); x1 = Math.max(x1, X); y1 = Math.max(y1, Y); }
+    // The recess the twin leaves while it is in the air.
+    if (p.role === 'twin' && p.lift > 0.05 && (Math.abs(p.ox) > 0.1 || Math.abs(p.oy) > 0.1)) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, p.lift) * 0.8;
+      ctx.fillStyle = '#0A0807';
+      ctx.fill(path);
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    withPiece(p, () => {
+      // Contact and ambient shadows grow with lift (canvas shadows ignore the transform).
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.55)';
+      ctx.shadowBlur = s * (0.1 + 0.35 * p.lift) * layout.dpr;
+      ctx.shadowOffsetY = s * (0.05 + 0.3 * p.lift) * layout.dpr;
+      ctx.fillStyle = '#141110';
+      ctx.fill(path);
+      ctx.restore();
+      material(p, path, [x0, y0, x1, y1]);
+      // Hairlines between a piece's own cells keep the area countable.
+      const hair = 0.075 * (1 - Math.min(1, p.tint)) + (p.role === 'twin' ? 0.1 : p.role === 'rest' ? 0.06 : 0) * Math.min(1, p.tint);
+      if (hair > 0.005) {
+        ctx.strokeStyle = p.role === 'rest' && p.tint > 0.5 ? 'rgba(80,66,48,' + hair * 2 + ')' : 'rgba(232,230,225,' + hair + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (const k of p.cells) {
+          const c = unkey(k);
+          if (p.cells.has(key(c.x + 1, c.y))) { const [X, Y] = px(c.x + 1, c.y); ctx.moveTo(X, Y + s * 0.18); ctx.lineTo(X, Y + s * 0.82); }
+          if (p.cells.has(key(c.x, c.y + 1))) { const [X, Y] = px(c.x, c.y + 1); ctx.moveTo(X + s * 0.18, Y); ctx.lineTo(X + s * 0.82, Y); }
+        }
+        ctx.stroke();
+      }
+      // Lit rim.
+      ctx.strokeStyle = p.role === 'twin' && p.tint > 0.5 ? 'rgba(255,236,190,0.55)' : 'rgba(255,238,215,0.16)';
+      ctx.lineWidth = 1;
+      ctx.stroke(path);
+      if (p.glow > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = p.opacity * 0.4 * p.glow;
+        ctx.fillStyle = '#FFE08C';
+        ctx.fill(path);
+        ctx.globalAlpha = p.opacity * 0.85 * p.glow;
+        ctx.strokeStyle = '#FFEEC0';
+        ctx.lineWidth = 1.5;
+        ctx.stroke(path);
+        ctx.restore();
+      }
+      if (misfit && p.role === 'twin' && misfit.alpha > 0) {
+        ctx.fillStyle = 'rgba(255,122,84,' + 0.75 * misfit.alpha + ')';
+        for (const k of misfit.moving) { const r = cellRect(k, s * 0.12); ctx.beginPath(); ctx.roundRect(...r, s * 0.08); ctx.fill(); }
+      }
+    });
+    if (misfit && p.role === 'rest' && misfit.alpha > 0) {
+      ctx.strokeStyle = 'rgba(255,122,84,' + 0.9 * misfit.alpha + ')';
+      ctx.lineWidth = 2;
+      for (const k of misfit.bare) {
+        const c = unkey(k);
+        const [cx, cy] = px(c.x + p.ox, c.y + p.oy);
+        ctx.beginPath(); ctx.roundRect(cx + s * 0.14, cy + s * 0.14, s * 0.72, s * 0.72, s * 0.08); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function moltenLine(points, tip, alpha, t) {
+    if (!points.length || alpha <= 0) return;
+    const s = layout.s;
+    const path = new Path2D();
+    points.forEach((v, i) => { const [X, Y] = px(v.x, v.y); i ? path.lineTo(X, Y) : path.moveTo(X, Y); });
+    if (tip) {
+      const h = points[points.length - 1];
+      const dx = tip.x - h.x, dy = tip.y - h.y;
+      const along = Math.abs(dx) >= Math.abs(dy) ? { x: h.x + Math.max(-0.45, Math.min(0.45, dx)), y: h.y } : { x: h.x, y: h.y + Math.max(-0.45, Math.min(0.45, dy)) };
+      const [X, Y] = px(along.x, along.y);
+      path.lineTo(X, Y);
+    }
+    ctx.save();
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.globalAlpha = alpha;
+    ctx.shadowColor = 'rgba(255,190,100,0.7)';
+    ctx.shadowBlur = s * 0.35 * layout.dpr;
+    ctx.strokeStyle = 'rgba(255,194,102,0.45)'; ctx.lineWidth = Math.max(5, s * 0.16); ctx.stroke(path);
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#E8CF8B'; ctx.lineWidth = Math.max(2.5, s * 0.07); ctx.stroke(path);
+    ctx.strokeStyle = 'rgba(255,250,236,0.9)'; ctx.lineWidth = Math.max(1, s * 0.026); ctx.stroke(path);
+    if (tip) {
+      const [X, Y] = px(tip.x, tip.y);
+      ctx.fillStyle = 'rgba(255,222,150,0.35)'; ctx.beginPath(); ctx.arc(X, Y, s * 0.22, 0, 7); ctx.fill();
+      ctx.fillStyle = '#FFF6E2'; ctx.beginPath(); ctx.arc(X, Y, Math.max(3, s * 0.07), 0, 7); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function emitDust(p, count) {
+    const edges = [];
+    for (const l of p.loops) for (let i = 0; i < l.length; i++) edges.push([l[i], l[(i + 1) % l.length]]);
+    for (let i = 0; i < count; i++) {
+      const [a, b] = edges[Math.floor(Math.random() * edges.length)];
+      const u = Math.random();
+      let x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u;
+      // Place on the piece as it now lies.
+      const dx = x - p.cent.x, dy = y - p.cent.y;
+      const [tx, ty] = [dx * Math.cos(p.angle) * p.flip - dy * Math.sin(p.angle), dx * Math.sin(p.angle) * p.flip + dy * Math.cos(p.angle)];
+      x = p.cent.x + p.ox + tx; y = p.cent.y + p.oy + ty;
+      const ang = Math.atan2(ty, tx) + (Math.random() - 0.5) * 1.2;
+      const sp = 0.6 + Math.random() * 1.4;
+      dust.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, at: now(), life: 0.45 + Math.random() * 0.4, r: 0.6 + Math.random() * 1.4 });
+    }
+  }
+
+  function frame() {
+    const t = now();
+    if (timeline) { const done = timeline.tl.run(t - timeline.t0); if (done && timeline) timeline = null; }
+    const { dpr, w, h, s } = layout;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    if (shake.amp > 0) {
+      const e = (t - shake.at) / 0.28;
+      if (e < 1) ctx.translate(Math.sin(e * 38) * shake.amp * (1 - e), Math.cos(e * 31) * shake.amp * 0.5 * (1 - e));
+      else shake.amp = 0;
+    }
+    // The table under the board: a warm pool of light.
+    const [bx, by] = px(board.w / 2, board.h / 2);
+    const pool = ctx.createRadialGradient(bx, by, 0, bx, by, Math.min(w, h) * 0.5);
+    pool.addColorStop(0, 'rgba(255,222,170,0.07)'); pool.addColorStop(1, 'rgba(255,222,170,0)');
+    ctx.fillStyle = pool; ctx.fillRect(0, 0, w, h);
+    // Grid points the line runs along.
+    if (phase === 'idle' || phase === 'drawing') {
+      ctx.fillStyle = 'rgba(232,230,225,0.13)';
+      for (let y = 0; y <= board.h; y++) for (let x = 0; x <= board.w; x++) { const [X, Y] = px(x, y); ctx.beginPath(); ctx.arc(X, Y, Math.max(1, s * 0.022), 0, 7); ctx.fill(); }
+    }
+    // Pieces: the rest first, the twin on top.
+    const order = pieces.slice().sort((a, b) => (a.role === 'twin') - (b.role === 'twin') || a.lift - b.lift);
+    for (const p of order) drawPiece(p, t);
+    // Hints: the ends, then the whole line.
+    if (hintTier > 0 && phase !== 'solved') {
+      const a = board.answerPath;
+      const pulse = 0.55 + 0.45 * Math.sin(t * 3.2);
+      if (hintTier >= 2) moltenLine(a, null, 0.28 + 0.12 * pulse, t);
+      for (const v of [a[0], a[a.length - 1]]) {
+        const [X, Y] = px(v.x, v.y);
+        ctx.fillStyle = 'rgba(255,222,150,' + 0.3 * pulse + ')'; ctx.beginPath(); ctx.arc(X, Y, s * 0.24, 0, 7); ctx.fill();
+        ctx.fillStyle = 'rgba(255,246,226,0.95)'; ctx.beginPath(); ctx.arc(X, Y, Math.max(3, s * 0.07), 0, 7); ctx.fill();
+      }
+    }
+    // First board: a ghost of the line drawing itself until the first touch.
+    if (guide && phase === 'idle' && t > guide.at) {
+      const a = board.answerPath, cyc = (t - guide.at) % 2.4, e = Math.min(1, cyc / 1.1);
+      const fade = cyc < 1.6 ? 1 : Math.max(0, 1 - (cyc - 1.6) / 0.6);
+      const pos = ease.inOut(e) * (a.length - 1), i = Math.floor(pos);
+      const A = a[Math.min(i, a.length - 1)], B = a[Math.min(i + 1, a.length - 1)];
+      const tip = { x: A.x + (B.x - A.x) * (pos - i), y: A.y + (B.y - A.y) * (pos - i) };
+      moltenLine(a.slice(0, i + 1).concat([tip]), null, 0.45 * fade, t);
+      const [X, Y] = px(tip.x, tip.y);
+      ctx.fillStyle = 'rgba(232,230,225,' + 0.22 * fade + ')'; ctx.beginPath(); ctx.arc(X, Y, s * 0.3, 0, 7); ctx.fill();
+    }
+    if (seam && seamAlpha > 0) moltenLine(seam, null, seamAlpha, t);
+    if (lineFade) {
+      const e = (t - lineFade.at) / 0.35;
+      if (e < 1) moltenLine(lineFade.points, null, 1 - e, t); else lineFade = null;
+    }
+    if (stroke) moltenLine(stroke.points, stroke.tip, 1, t);
+    // Shockwave and dust.
+    if (ring) {
+      const e = (t - ring.at) / 0.6;
+      if (e < 1) {
+        const [X, Y] = px(ring.x, ring.y);
+        ctx.strokeStyle = 'rgba(244,217,143,' + 0.7 * (1 - e) + ')';
+        ctx.lineWidth = 1.5 * (1 - e) + 0.5;
+        ctx.beginPath(); ctx.arc(X, Y, s * (0.4 + Math.max(board.w, board.h) * 0.55 * ease.out(e)), 0, 7); ctx.stroke();
+      } else ring = null;
+    }
+    dust = dust.filter(d => t - d.at < d.life);
+    for (const d of dust) {
+      const e = (t - d.at) / d.life, k = ease.out(e);
+      const [X, Y] = px(d.x + d.vx * 0.5 * k, d.y + d.vy * 0.5 * k);
+      ctx.fillStyle = 'rgba(255,232,180,' + 0.6 * (1 - e) + ')';
+      ctx.beginPath(); ctx.arc(X, Y, d.r, 0, 7); ctx.fill();
+    }
+    ctx.restore();
+    requestAnimationFrame(frame);
+  }
+
+  load(index, { card: false });
+  requestAnimationFrame(frame);
+  if (window.ResizeObserver) new ResizeObserver(() => board && resize()).observe(canvas);
+})();
+</script>
+</body>
+</html>
