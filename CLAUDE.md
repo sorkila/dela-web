@@ -46,6 +46,7 @@ Deploys finish in ~15s. Watch with `gh run list -R sorkila/dela-web` and `gh run
 | `404.html` | Branded 404: an ivory bar and a gold bar that aren't twins, the gold one slowly rocking. |
 | `style.css` | Shared chrome. Palette, body, footer, links, type, focus, reduced motion. Owns the `body::before` spotlight, the `body::after` grain overlay, the `@view-transition` cut-open navigation, and the `@font-face` rules. |
 | `shots/*.webp` | Board crops for How it plays: `stroke`, `halves`, `landing`, `miss`, `hint` (660×825, WebP q80, ~20-35 KB each). Cropped from the 2.0 store captures in `Dela/store_assets/v2/raw_iphone/` by `tools/screens.py`. |
+| `badges/app-store-black.svg` | Apple's official App Store badge (see App Store badge). |
 | `og.png` | 1200×630 OG image: gold Pirata "Dela" and "One line, two identical halves." beside an ivory and a gold-leaf twin, parted along a staircase cut, on the warm table. Rendered by `tools/brand.py`. |
 | `favicon.svg` + `favicon-16x16.png`, `favicon-32x32.png`, `favicon.ico` (16/32/48) | Pirata One capital 'D' in gold on a rounded `#131110` tile (outlined glyph path, no font dependency). The tile keeps it legible on light and dark tab bars. Rendered by `tools/brand.py`. |
 | `apple-touch-icon.png` | The 2.0 app icon (ivory and gold twins), 180×180, resized from `Dela/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png` by `tools/brand.py --touch-icon`. |
@@ -125,15 +126,20 @@ Pages need `position: relative; z-index: 1` on their main content container so i
 
 The 2.0 loop in miniature, one SVG (`viewBox 0 0 200 200`, cell = 30 units) built by the script at the end of `index.html`:
 
-1. A lacquer shape sets down (traced outline with rounded corners, sheen, lit rim, faint hairlines between cells, layered contact + ambient drop shadows).
-2. A molten gold line draws along the grid, edge to edge, bends included: three stacked strokes (blurred glow, gold core, hot white core) via `stroke-dashoffset`, with a glowing tip riding the leading end.
-3. The shape splits: the whole crossfades to two halves that tint ivory (rests) and gold leaf (travels). The line cools.
-4. The gold half lifts (scale 1.07, the shadow grows), travels and turns (or flips) onto its twin, and drops. A small squash on both halves, a flash, and gold dust.
-5. Hold, fade, next board.
+Timing follows the app's landing (`TableScene.landing`): about 5 s a board.
+
+1. A lacquer shape sets down from a slight lift (traced outline with rounded corners, sheen, lit rim, faint hairlines between cells, layered contact + ambient drop shadows).
+2. A molten gold line draws along the grid, edge to edge, bends included: three stacked strokes (blurred glow, gold core, hot white core) via `stroke-dashoffset`, with a glowing tip riding the leading end. The tip sheds sparks, a burst at each bend; `timeAt` inverts the draw easing so each spark leaves exactly when the tip passes.
+3. The split: the whole crossfades to two halves that tint ivory (rests) and gold leaf (travels) and part a hair (0.06 cell / a third of that, as in the app). The line cools from the inside out: white core, gold core, glow.
+4. The gold half lifts off a recess (`.fig-tray`), carries on a short arc (`bArc`) while it turns or flips, and slams onto its twin (one keyframed timeline on `bMove`).
+5. The thud: a small table shake (`rig`), a squash, a gold flash and halo, a shockwave ring (`.fig-ring`, reach sized to the board as `ringReach`), dust off the landed outline; the tray lets go.
+6. The pair settles to the centre of the figure and a light band (`#g-band`, clipped to the landed outline) crosses it. Hold, sink and fade, next board.
+
+On pointer-fine devices the spotlight loop also lights the figure: `#g-sheen` follows the cursor and `#g-gold` turns a few degrees, like the app's tilt light.
 
 Boards are real chapter II boards from `Dela/Sources/LevelsTwins.swift` (2003, 2011, 2004, 2013) in the app's row codec with the answer line as grid vertices. The script flood-fills the split, finds the flip/turn that maps the gold half onto the ivory one (so any twin board can be added), and warns in the console if a board has no twin fit. The half nearer the top left rests.
 
-Every step is a Web Animation (`element.animate`, `fill: 'forwards'`), so a cycle is `Promise.all` of their `finished` and nothing drifts on tab throttling. Gotchas: animations on the same property of the same element must not use `fill: 'both'` (a later one's backward fill overrides an earlier one); transforms use `transform-box: view-box; transform-origin: 0 0` and coordinates are baked into absolute viewBox units, so no parent group carries a transform; the drop-shadow filter sits on an outer group and the transform on an inner one so the shadow doesn't turn with the piece.
+Every step is a Web Animation (`element.animate`, `fill: 'forwards'`), so a cycle is `Promise.all` of their `finished` and nothing drifts on tab throttling. Gotchas: animations on the same property of the same element must not use `fill: 'both'` (a later one's backward fill overrides an earlier one); transforms use `transform-box: view-box; transform-origin: 0 0` and coordinates are baked into absolute viewBox units; parent groups (`rig`, `settle`, `squash`) only translate or scale about baked points, so the children's maths still holds; the light band's clip path is in the referencing group's space, so it moves with `settle`; a `clip-path` isolates its group, so `mix-blend-mode` inside it blends with nothing (the band uses plain opacity); the drop-shadow filter sits on an outer group and the transform on an inner one so the shadow doesn't turn with the piece.
 
 `prefers-reduced-motion`: no loop; the first board is shown split, tinted, halves parted by 5 units. The 1.x drag-to-cut interaction and "drag to cut" hint were removed with the 2.0 figure.
 
@@ -156,7 +162,7 @@ Support uses `<dl>/<dt>/<dd>` in three groups and ships a FAQPage schema that mi
 
 ### App Store badge
 
-Links to `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158`. Custom non-Apple glyph; gold border on hover. **Outstanding:** swap for Apple's official "Download on the App Store" badge artwork (marketing guidelines say don't modify it).
+Apple's official black "Download on the App Store" badge, `badges/app-store-black.svg`, downloaded unmodified from Apple Marketing Tools (`https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us`; the old `tools.applemarketingtools.com` host no longer resolves). Shown at 50px high as an `<img>` inside the link to `https://apps.apple.com/app/dela-the-art-of-dividing/id6766864158`, in the hero and the closing section. Never recolour, restyle or redraw it: only its size, a 1px lift + drop shadow on hover and the gold focus ring are ours. Apple's rules: at least 40px high on screen, clear space of a quarter of its height (`.badge-row` pads 12px).
 
 ## Brand and content rules
 
@@ -231,7 +237,6 @@ Force HTTPS, HSTS (1 year), `X-Content-Type-Options: nosniff`, `Referrer-Policy:
 
 - **Press kit extras** (optional): a Pirata "Dela" wordmark PNG + SVG (the site renders it as text, so there is no file to ship yet) and the App Preview. Rerun `tools/presskit.py` if the store screenshots are recaptured.
 - **App Preview on the site** (optional): `Dela/store_assets/v2/preview_iphone.mp4` could run muted, looping and lazy-loaded if re-encoded to ~2-3 MB at 540 wide without audio. Not added yet.
-- **Official Apple badge artwork.**
 - **Sitemap submission** to Google Search Console.
 - **Stale CLAUDE.md on the server**: excluded from deploy since 2026-09-27, but 1.x put a copy in `/public_html/`. Confirm it's gone after the launch deploy.
 - **Custom logotype** drawn for Dela rather than Pirata One (deferred, costly).
