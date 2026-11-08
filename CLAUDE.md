@@ -15,6 +15,7 @@ The site exists for three jobs, in order: satisfy App Store Connect's mandatory 
 - `main` is the live 1.x site. **Every push to `main` deploys** (see Deployment).
 - `v2` holds the Dela 2.0 site (twins redesign, free to try, sentence case, ink and gold). It merges to `main` on launch day, **Tue 17 Nov 2026**, when the 2.0 update goes live on the App Store. Never push it early: the live 1.x listing would contradict it (price, IAP, screenshots).
 - Dates written for launch: privacy "Effective 17 November 2026", sitemap `lastmod` 2026-11-17, press fact sheet and llms.txt say 2.0 released 17 November 2026. If launch moves, update all four.
+- Launch moved to the end of September (commit 2c15158) and `main` carries the 2.0 site. Sitemap `lastmod` is the date each page last changed, never a future date (fixed 2026-11-08: four URLs said 2026-11-17, which Google can discard).
 
 ## Stack
 
@@ -154,7 +155,7 @@ Ten real boards from the app, playable with mouse or touch, for posts and press 
 - **Teaching:** board 1 draws a ghost of its line until the first touch; the first twins board (2003) draws its decoy and plays the miss before handing over, like the app's rehearsal. A hint button appears after three misses: the line's ends, then the whole line.
 - **Sound** is synthesized with Web Audio (tick, lift, thud, chord, knock), off with the header toggle; `navigator.vibrate` where it exists.
 - **Storage:** `dela.web.board`, `dela.web.sound`, `dela.web.done` in localStorage (disclosed on `/privacy/`).
-- **Umami events:** `play-start`, `board-solved` (board id, position, misses), `hint`, `play-complete`, `share`, `store-click` (`where`: foot or end). This is the funnel to watch after a post.
+- **Umami events:** `app-store-click` (see Privacy & analytics), `play-start`, `board-solved` (board id, position, misses), `hint`, `play-complete`, `share`, `store-click` (`where`: foot or end). This is the funnel to watch after a post.
 - Home links it under the hero badge ("Or play ten boards in your browser") and under the closing badge.
 
 ## Page structure
@@ -199,6 +200,8 @@ The daily mode was removed from the app in September 2026. The site has no daily
 
 The site uses **Umami Cloud** for aggregate, cookieless visit counting (`<script defer src="https://cloud.umami.is/script.js" data-website-id="6dcc31dc-88bf-40f4-b641-b362c6f1867d">`), disclosed in `/privacy` under "About this website". Don't add other analytics, pixels, or tracking.
 
+`/track.js` (2026-11-08) sends `app-store-click` (`page`, `placement` from the link's `data-where`) for every `apps.apple.com` link, on every page that has one (home, play, press): add the script tag to any new page with a store link. It is getvelm.com's pattern, a capture-phase listener calling `umami.track`, never `data-umami-event`, whose handler navigates from script and breaks the iOS hand-off to the App Store app. The portfolio dash (`projects.json`) reads this event name.
+
 ### iOS app behaviour the site asserts (2.0)
 
 App Store reviewers read these pages, so the claims must match the build. If the app changes, update the page first.
@@ -223,7 +226,7 @@ Every page preloads the fonts it uses on first paint (Inter upright + Pirata; ho
 
 ## Server config (`.htaccess`)
 
-Force HTTPS, HSTS (1 year), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `ErrorDocument 404 /404.html`, and `Cache-Control: public, max-age=31536000, immutable` on fonts and static images. HTML and CSS are deliberately not cached so copy and style edits propagate on deploy.
+www.playdela.com 301s to the apex (added 2026-11-08), force HTTPS, HSTS (1 year), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `ErrorDocument 404 /404.html`, and `Cache-Control: public, max-age=31536000, immutable` on fonts and static images. HTML and CSS are deliberately not cached so copy and style edits propagate on deploy.
 
 ## Conventions
 

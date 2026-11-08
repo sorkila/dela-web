@@ -3,6 +3,13 @@
 # If a directive doesn't take effect, the same setting needs toggling in Inleed's
 # control panel (Force HTTPS, custom 404, security headers).
 
+# --- www to apex (one host, as on ullie.app) ---
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.playdela\.com$ [NC]
+  RewriteRule ^ https://playdela.com%{REQUEST_URI} [L,R=301]
+</IfModule>
+
 # --- Force HTTPS ---
 <IfModule mod_rewrite.c>
   RewriteEngine On
